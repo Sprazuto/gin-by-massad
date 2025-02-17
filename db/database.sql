@@ -10,16 +10,16 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
--- Name: manajemen_pengetahuan; Type: DATABASE; Schema: -; Owner: postgres
+-- Name: gin_public; Type: DATABASE; Schema: -; Owner: postgres
 --
-DROP DATABASE manajemen_pengetahuan;
+DROP DATABASE gin_public;
 
-CREATE DATABASE manajemen_pengetahuan WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+CREATE DATABASE gin_public WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
 
 
-ALTER DATABASE manajemen_pengetahuan OWNER TO postgres;
+ALTER DATABASE gin_public OWNER TO postgres;
 
-\connect manajemen_pengetahuan
+\connect gin_public
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
