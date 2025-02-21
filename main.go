@@ -113,40 +113,6 @@ func main() {
 		v1.GET("/article/:id/:format", TokenAuthMiddleware(), article.One)
 		v1.PUT("/article/:id", TokenAuthMiddleware(), article.Update)
 		v1.DELETE("/article/:id", TokenAuthMiddleware(), article.Delete)
-
-		/*** START LkeRekap ***/
-		lkeRekap := new(controllers.LkeRekapController)
-
-		v1.POST("/lke-rekap", TokenAuthMiddleware(), lkeRekap.Create)
-		v1.GET("/lke-rekaps", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekaps/:format", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.One)
-		v1.GET("/lke-rekap/:id/:format", TokenAuthMiddleware(), lkeRekap.One)
-		v1.PUT("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Update)
-		v1.DELETE("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Delete)
-		v1.GET("/lke-rekap/opd/:id_opd/tahun/:tahun", TokenAuthMiddleware(), lkeRekap.GetByOPDAndTahun)
-
-		/*** START LkeEvaluasi ***/
-		lkeEvaluasi := new(controllers.LkeEvaluasiController)
-
-		v1.POST("/lke-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.Create)
-		v1.GET("/lke-evaluasis", TokenAuthMiddleware(), lkeEvaluasi.All)
-		v1.GET("/lke-evaluasis/:format", TokenAuthMiddleware(), lkeEvaluasi.All)
-		v1.GET("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.One)
-		v1.GET("/lke-evaluasi/:id/:format", TokenAuthMiddleware(), lkeEvaluasi.One)
-		v1.PUT("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Update)
-		v1.DELETE("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Delete)
-
-		/*** START LkeKomponen ***/
-		lkeKomponen := new(controllers.LkeKomponenController)
-
-		v1.POST("/lke-komponen", TokenAuthMiddleware(), lkeKomponen.Create)
-		v1.GET("/lke-komponens", TokenAuthMiddleware(), lkeKomponen.All)
-		v1.GET("/lke-komponens/:format", TokenAuthMiddleware(), lkeKomponen.All)
-		v1.GET("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.One)
-		v1.GET("/lke-komponen/:id/:format", TokenAuthMiddleware(), lkeKomponen.One)
-		v1.PUT("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Update)
-		v1.DELETE("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Delete)
 	}
 
 	r.LoadHTMLGlob("./public/html/*")
