@@ -15,10 +15,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Massad/gin-boilerplate/controllers"
-	"github.com/Massad/gin-boilerplate/db"
-	"github.com/Massad/gin-boilerplate/forms"
 	"github.com/joho/godotenv"
+	"lke-app/controllers"
+	"lke-app/db"
+	"lke-app/forms"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -27,8 +27,8 @@ import (
 
 var auth = new(controllers.AuthController)
 
-//TokenAuthMiddleware ...
-//JWT Authentication middleware attached to each request that needs to be authenitcated to validate the access_token in the header
+// TokenAuthMiddleware ...
+// JWT Authentication middleware attached to each request that needs to be authenitcated to validate the access_token in the header
 func TokenAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth.TokenValid(c)

@@ -7,9 +7,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/Massad/gin-boilerplate/controllers"
-	"github.com/Massad/gin-boilerplate/db"
-	"github.com/Massad/gin-boilerplate/forms"
+	"lke-app/controllers"
+	"lke-app/db"
+	"lke-app/forms"
+
 	"github.com/gin-contrib/gzip"
 	uuid "github.com/google/uuid"
 	"github.com/joho/godotenv"

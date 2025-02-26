@@ -3,8 +3,8 @@ package models
 import (
 	"errors"
 
-	"github.com/Massad/gin-boilerplate/db"
-	"github.com/Massad/gin-boilerplate/forms"
+	"lke-app/db"
+	"lke-app/forms"
 
 	"golang.org/x/crypto/bcrypt"
 )
