@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Massad/gin-boilerplate/db"
-	"github.com/Massad/gin-boilerplate/forms"
+	"lke-app/db"
+	"lke-app/forms"
 )
 
 // LkeRekap represents the lke_rekap table
@@ -182,9 +182,9 @@ func (m LkeRekapModel) OneWithEvaluasi(userID int64, idOPD int64, tahun int) (lk
 		SELECT l.*, json_build_object('id', u.id, 'name', u.name, 'email', u.email) AS user
 		FROM public.lke_rekap l
 		LEFT JOIN public.user u ON l.user_id = u.id
-		WHERE l.id_opd=$1 AND l.tahun=$2 LIMIT 1`
+		WHERE l.user_id=$1 AND l.id_opd=$2 AND l.tahun=$3 LIMIT 1`
 
-	err = db.GetDB().SelectOne(&lkeRekap, query, idOPD, tahun)
+	err = db.GetDB().SelectOne(&lkeRekap, query, userID, idOPD, tahun)
 
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {

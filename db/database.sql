@@ -12,11 +12,27 @@ SET client_min_messages = warning;
 --
 -- Name: gin_public; Type: DATABASE; Schema: -; Owner: postgres
 --
-DROP DATABASE eoffice_lke;
+DO $$
+DECLARE
+    db_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO db_count FROM pg_stat_activity WHERE datname = 'eoffice_lke';
+    IF db_count = 0 THEN
+        EXECUTE 'DROP DATABASE eoffice_lke';
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Could not drop database, it may be in use.';
+END $$;
 
-CREATE DATABASE eoffice_lke WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'eoffice_lke') THEN
+        CREATE DATABASE eoffice_lke WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
 
-ALTER DATABASE eoffice_lke OWNER TO postgres;
+        ALTER DATABASE eoffice_lke OWNER TO postgres;
+    END IF;
+END $$;
 
 \connect eoffice_lke
 

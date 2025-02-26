@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Massad/gin-boilerplate/db"
-	"github.com/Massad/gin-boilerplate/forms"
+	"lke-app/db"
+	"lke-app/forms"
 )
 
 // LkeEvaluasi represents the lke_evaluasi table

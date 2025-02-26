@@ -1,6 +1,6 @@
 ![alt tag](https://upload.wikimedia.org/wikipedia/commons/2/23/Golang.png)
 
-[![License](https://img.shields.io/github/license/Massad/gin-boilerplate)](https://github.com/Massad/gin-boilerplate/blob/master/LICENSE) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Massad/gin-boilerplate)](https://github.com/Massad/gin-boilerplate/releases) [![Go Version](https://img.shields.io/github/go-mod/go-version/Massad/gin-boilerplate)](https://github.com/Massad/gin-boilerplate/blob/master/go.mod) [![DB Version](https://img.shields.io/badge/DB-PostgreSQL--latest-blue)](https://github.com/Massad/gin-boilerplate/blob/master/go.mod) [![DB Version](https://img.shields.io/badge/DB-Redis--latest-blue)](https://github.com/Massad/gin-boilerplate/blob/master/go.mod)
+[![License](https://img.shields.io/github/license/Massad/gin-boilerplate)](https://lke-app/blob/master/LICENSE) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Massad/gin-boilerplate)](https://lke-app/releases) [![Go Version](https://img.shields.io/github/go-mod/go-version/Massad/gin-boilerplate)](https://lke-app/blob/master/go.mod) [![DB Version](https://img.shields.io/badge/DB-PostgreSQL--latest-blue)](https://lke-app/blob/master/go.mod) [![DB Version](https://img.shields.io/badge/DB-Redis--latest-blue)](https://lke-app/blob/master/go.mod)
 
 [![Build Status](https://travis-ci.org/Massad/gin-boilerplate.svg?branch=master)](https://travis-ci.org/Massad/gin-boilerplate) [![Go Report Card](https://goreportcard.com/badge/github.com/Massad/gin-boilerplate)](https://goreportcard.com/report/github.com/Massad/gin-boilerplate)
 
@@ -160,7 +160,7 @@ That's just an example, of course you can implement your own way.
 
     No longer supported
 
-You will find the last update on v1 in [v1-session-cookies-auth](https://github.com/Massad/gin-boilerplate/tree/v1-session-cookies-auth) branch or [v1.0.5 release](https://github.com/Massad/gin-boilerplate/releases/tag/1.05) that supported the authentication using the **session** and **cookies** stored in **Redis** if needed.
+You will find the last update on v1 in [v1-session-cookies-auth](https://lke-app/tree/v1-session-cookies-auth) branch or [v1.0.5 release](https://lke-app/releases/tag/1.05) that supported the authentication using the **session** and **cookies** stored in **Redis** if needed.
 
 - [RedisStore](https://github.com/gin-gonic/contrib/tree/master/sessions): Gin middleware for session management with multi-backend support (currently cookie, Redis).
 
