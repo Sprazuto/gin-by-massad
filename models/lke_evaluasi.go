@@ -7,6 +7,7 @@ import (
 
 	"lke-app/db"
 	"lke-app/forms"
+	"lke-app/services"
 )
 
 // LkeEvaluasi represents the lke_evaluasi table
@@ -35,6 +36,7 @@ type LkeEvaluasiModel struct{}
 func (m LkeEvaluasiModel) CreateOrUpdate(userID int64, form forms.CreateLkeEvaluasiForm) (lkeEvaluasiID int64, err error) {
 	// Check if the record exists
 	var existingID int64
+	var existingBerkas string
 	err = db.GetDB().QueryRow(`
 		SELECT id FROM public.lke_evaluasi
 		WHERE lke_rekap_id = $1 AND kode_evaluasi = $2`,
@@ -42,6 +44,22 @@ func (m LkeEvaluasiModel) CreateOrUpdate(userID int64, form forms.CreateLkeEvalu
 
 	if err == nil {
 		// Record exists, update it
+		// Delete the object if it exists
+		if existingID != 0 && form.Berkas != nil {
+			err = db.GetDB().QueryRow(`
+				SELECT berkas FROM public.lke_evaluasi
+				WHERE id = $1`,
+				existingID).Scan(&existingBerkas)
+			if err == nil {
+				if existingBerkas != "" {
+					err = services.DeleteObject(existingBerkas) // Assuming form.Berkas contains the object name to delete
+					if err != nil {
+						return 0, err
+					}
+				}
+			}
+		}
+
 		return existingID, m.Update(userID, existingID, form)
 	}
 
@@ -73,7 +91,17 @@ func (m LkeEvaluasiModel) One(userID, id int64) (lkeEvaluasi LkeEvaluasi, err er
 	return lkeEvaluasi, err
 }
 
-// All gets all lke_evaluasi records for a user
+func (m LkeEvaluasiModel) OneByRekapIDAndKodeEvaluasi(userID int64, lkeRekapID int64, kodeEvaluasi string) (lkeEvaluasi LkeEvaluasi, err error) {
+	// Get a single lke_evaluasi record based on lkeRekapID and kodeEvaluasi
+	err = db.GetDB().SelectOne(&lkeEvaluasi, `
+		SELECT l.*, json_build_object('id', u.id, 'name', u.name, 'email', u.email) AS user
+		FROM public.lke_evaluasi l
+		LEFT JOIN public.user u ON l.user_id = u.id
+		WHERE l.user_id=$1 AND l.lke_rekap_id=$2 AND l.kode_evaluasi=$3 LIMIT 1`,
+		userID, lkeRekapID, kodeEvaluasi)
+	return lkeEvaluasi, err
+}
+
 func (m LkeEvaluasiModel) All(userID int64) (lkeEvaluasis []DataList, err error) {
 	_, err = db.GetDB().Select(&lkeEvaluasis, `
 		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]') AS data,
