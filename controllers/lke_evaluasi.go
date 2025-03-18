@@ -6,13 +6,13 @@ import (
 
 	"lke-app/forms"
 	"lke-app/models"
+	"lke-app/services"
 
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// LkeEvaluasiController ...
 type LkeEvaluasiController struct{}
 
 var lkeEvaluasiModel = new(models.LkeEvaluasiModel)
@@ -24,10 +24,27 @@ func (ctrl LkeEvaluasiController) Create(c *gin.Context) {
 
 	var form forms.CreateLkeEvaluasiForm
 
-	if validationErr := c.ShouldBindJSON(&form); validationErr != nil {
+	if validationErr := c.ShouldBind(&form); validationErr != nil {
 		message := lkeEvaluasiForm.Create(validationErr)
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"message": message})
 		return
+	}
+
+	// Handle file upload only for PUT method
+	if c.Request.Method == http.MethodPut {
+		file, err := c.FormFile("file") // Ensure the file is sent with the key "file"
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "File is required"})
+			return
+		}
+
+		// Upload file to MinIO
+		fileURL, err := services.UploadFile(file)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Failed to upload file", "error": err.Error()})
+			return
+		}
+		form.Berkas = &fileURL
 	}
 
 	id, err := lkeEvaluasiModel.CreateOrUpdate(userID, form)
@@ -153,4 +170,31 @@ func (ctrl LkeEvaluasiController) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "LkeEvaluasi deleted"})
+}
+
+// GetSignedURL returns a signed URL for the specified LkeRekapID and KodeEvaluasi
+func (ctrl LkeEvaluasiController) GetSignedURL(c *gin.Context) {
+	lkeRekapID := c.Param("lke_rekap_id")
+	kodeEvaluasi := c.Param("kode_evaluasi")
+
+	if lkeRekapID == "" || kodeEvaluasi == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "lke_rekap_id and kode_evaluasi are required"})
+		return
+	}
+
+	// Logic to retrieve the record and generate the signed URL
+	lkeRekapIDInt, err := strconv.ParseInt(lkeRekapID, 10, 64)
+	record, err := lkeEvaluasiModel.OneByRekapIDAndKodeEvaluasi(getUserID(c), lkeRekapIDInt, kodeEvaluasi)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "Record not found"})
+		return
+	}
+
+	signedURL, err := services.GenerateSignedURL(record.Berkas.String)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate signed URL", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"signed_url": signedURL})
 }
