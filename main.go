@@ -10,6 +10,7 @@ import (
 	"lke-app/controllers"
 	"lke-app/db"
 	"lke-app/forms"
+	"lke-app/services"
 
 	"github.com/gin-contrib/gzip"
 	uuid "github.com/google/uuid"
@@ -89,6 +90,8 @@ func main() {
 	//Example: db.GetRedis().Set(KEY, VALUE, at.Sub(now)).Err()
 	db.InitRedis(1)
 
+	services.InitializeMinioClient()
+
 	v1 := r.Group("/v1")
 	{
 		/*** START USER ***/
@@ -131,12 +134,14 @@ func main() {
 		lkeEvaluasi := new(controllers.LkeEvaluasiController)
 
 		v1.POST("/lke-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.Create)
+		v1.PUT("/lke-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.Create)
 		v1.GET("/lke-evaluasis", TokenAuthMiddleware(), lkeEvaluasi.All)
 		v1.GET("/lke-evaluasis/:format", TokenAuthMiddleware(), lkeEvaluasi.All)
 		v1.GET("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.One)
 		v1.GET("/lke-evaluasi/:id/:format", TokenAuthMiddleware(), lkeEvaluasi.One)
 		v1.PUT("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Update)
 		v1.DELETE("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Delete)
+		v1.GET("/lke-evaluasi/signed-url/:lke_rekap_id/:kode_evaluasi", TokenAuthMiddleware(), lkeEvaluasi.GetSignedURL)
 
 		/*** START LkeKomponen ***/
 		lkeKomponen := new(controllers.LkeKomponenController)
@@ -148,6 +153,16 @@ func main() {
 		v1.GET("/lke-komponen/:id/:format", TokenAuthMiddleware(), lkeKomponen.One)
 		v1.PUT("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Update)
 		v1.DELETE("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Delete)
+
+		v1.GET("/signed-url/:objectName", TokenAuthMiddleware(), func(c *gin.Context) {
+			objectName := c.Param("objectName")
+			signedURL, err := services.GenerateSignedURL(objectName)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"signed_url": signedURL})
+		})
 	}
 
 	r.LoadHTMLGlob("./public/html/*")
