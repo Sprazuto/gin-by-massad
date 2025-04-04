@@ -12,23 +12,24 @@ import (
 
 // LkeRekap represents the lke_rekap table
 type LkeRekap struct {
-	ID             int64         `db:"id, primarykey, autoincrement" json:"id"`
-	UserID         int64         `db:"user_id" json:"-"`
-	IDOPD          int64         `db:"id_opd" json:"id_opd"`
-	Tahun          int           `db:"tahun" json:"tahun"`
-	NilaiCapaian   float64       `db:"nilai_capaian" json:"nilai_capaian"`
-	Kelengkapan    float64       `db:"kelengkapan" json:"kelengkapan"`
-	PredikatAkhir  string        `db:"predikat_akhir" json:"predikat_akhir"`
-	Predikat       string        `db:"predikat" json:"predikat"`
-	StatusEvaluasi string        `db:"status_evaluasi" json:"status_evaluasi"`
-	IDVerifikator  NullInt64     `db:"id_verifikator" json:"id_verifikator"`
-	IDKetua        NullInt64     `db:"id_ketua" json:"id_ketua"`
-	IDEvaluator    NullInt64     `db:"id_evaluator" json:"id_evaluator"`
-	IDPengendali   NullInt64     `db:"id_pengendali" json:"id_pengendali"`
-	UpdatedAt      int64         `db:"updated_at" json:"updated_at"`
-	CreatedAt      int64         `db:"created_at" json:"created_at"`
-	User           *JSONRaw      `db:"user" json:"user"`
-	Evaluasi       []LkeEvaluasi `json:"evaluasi"`
+	ID             int64           `db:"id, primarykey, autoincrement" json:"id"`
+	UserID         int64           `db:"user_id" json:"-"`
+	IDOPD          int64           `db:"id_opd" json:"id_opd"`
+	Tahun          int             `db:"tahun" json:"tahun"`
+	NilaiCapaian   float64         `db:"nilai_capaian" json:"nilai_capaian"`
+	Kelengkapan    float64         `db:"kelengkapan" json:"kelengkapan"`
+	PredikatAkhir  string          `db:"predikat_akhir" json:"predikat_akhir"`
+	Predikat       string          `db:"predikat" json:"predikat"`
+	StatusEvaluasi string          `db:"status_evaluasi" json:"status_evaluasi"`
+	IDVerifikator  NullInt64       `db:"id_verifikator" json:"id_verifikator"`
+	IDKetua        NullInt64       `db:"id_ketua" json:"id_ketua"`
+	IDEvaluator    NullInt64       `db:"id_evaluator" json:"id_evaluator"`
+	IDPengendali   NullInt64       `db:"id_pengendali" json:"id_pengendali"`
+	UpdatedAt      int64           `db:"updated_at" json:"updated_at"`
+	CreatedAt      int64           `db:"created_at" json:"created_at"`
+	User           *JSONRaw        `db:"user" json:"user"`
+	Evaluasi       []LkeEvaluasi   `json:"evaluasi"`
+	Rekomendasi    *LkeRekomendasi `json:"rekomendasi"`
 }
 
 // LkeRekapModel handles database operations
@@ -61,7 +62,7 @@ func (m LkeRekapModel) One(userID, id int64) (lkeRekap LkeRekap, err error) {
 }
 
 // All gets all lke_rekap records for a user
-func (m LkeRekapModel) All(userID int64) (lkeRekaps []DataList, err error) {
+func (m LkeRekapModel) All(userID int64, tahun int) (lkeRekaps []DataList, err error) {
 	_, err = db.GetDB().Select(&lkeRekaps, `
 		SELECT COALESCE(array_to_json(array_agg(row_to_json(d))), '[]') AS data,
 		(SELECT row_to_json(n) FROM (
@@ -73,10 +74,10 @@ func (m LkeRekapModel) All(userID int64) (lkeRekaps []DataList, err error) {
 			SELECT l.*, json_build_object('id', u.id, 'name', u.name, 'email', u.email) AS user
 			FROM public.lke_rekap l
 			LEFT JOIN public.user u ON l.user_id = u.id
-			WHERE l.user_id=$1
+			WHERE l.user_id=$1 AND l.tahun=$2
 			ORDER by l.id DESC
 		) d`,
-		userID)
+		userID, tahun)
 	return lkeRekaps, err
 }
 
@@ -223,6 +224,14 @@ func (m LkeRekapModel) OneWithEvaluasi(userID int64, idOPD int64, tahun int) (lk
 		FROM public.lke_evaluasi e
 		LEFT JOIN public.lke_komponen k ON e.kode_evaluasi = k.kode_evaluasi
 		WHERE e.lke_rekap_id=$1`,
+		lkeRekap.ID)
+
+	// Get related lke_rekomendasi record (1:1 relationship)
+	lkeRekap.Rekomendasi = &LkeRekomendasi{}
+	_ = db.GetDB().SelectOne(lkeRekap.Rekomendasi, `
+		SELECT r.*
+		FROM public.lke_rekomendasi r
+		WHERE r.parent_id=$1 LIMIT 1`,
 		lkeRekap.ID)
 
 	return lkeRekap, nil

@@ -3,6 +3,7 @@ package controllers
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"lke-app/forms"
 	"lke-app/models"
@@ -44,8 +45,21 @@ func (ctrl LkeRekapController) All(c *gin.Context) {
 	userID := getUserID(c)
 
 	format := c.Param("format")
+	year := c.Param("year")
 
-	results, err := lkeRekapModel.All(userID)
+	var tahun int
+	if year == "" {
+		tahun = time.Now().Year() - 1 // Default to current tahun - 1
+	} else {
+		var err error
+		tahun, err = strconv.Atoi(year)
+		if err != nil || tahun <= 0 {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Message": "Invalid year parameter - must be a positive integer"})
+			return
+		}
+	}
+
+	results, err := lkeRekapModel.All(userID, tahun)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"Message": "Could not get lke_rekap records"})
 		return

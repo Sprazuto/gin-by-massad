@@ -96,7 +96,7 @@ SET default_with_oids = false;
 -- Name: article; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE article (
+CREATE TABLE IF NOT EXISTS article (
     id integer NOT NULL,
     user_id integer,
     title character varying,
@@ -104,6 +104,13 @@ CREATE TABLE article (
     updated_at integer,
     created_at integer
 );
+
+ALTER TABLE article
+    ALTER COLUMN user_id SET NOT NULL,
+    ALTER COLUMN title SET DATA TYPE character varying,
+    ALTER COLUMN content SET DATA TYPE text,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
 
 ALTER TABLE article OWNER TO postgres;
 
@@ -130,7 +137,7 @@ ALTER SEQUENCE article_id_seq OWNED BY article.id;
 -- Name: user; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE "user" (
+CREATE TABLE IF NOT EXISTS "user" (
     id integer NOT NULL,
     email character varying,
     password character varying,
@@ -138,6 +145,13 @@ CREATE TABLE "user" (
     updated_at integer,
     created_at integer
 );
+
+ALTER TABLE "user"
+    ALTER COLUMN email SET DATA TYPE character varying,
+    ALTER COLUMN password SET DATA TYPE character varying,
+    ALTER COLUMN name SET DATA TYPE character varying,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
 
 ALTER TABLE "user" OWNER TO postgres;
 
@@ -164,7 +178,7 @@ ALTER SEQUENCE user_id_seq OWNED BY "user".id;
 -- Name: lke_rekap; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE lke_rekap (
+CREATE TABLE IF NOT EXISTS lke_rekap (
     id integer NOT NULL,
     user_id integer,
     id_opd integer,
@@ -181,6 +195,22 @@ CREATE TABLE lke_rekap (
     updated_at integer,
     created_at integer
 );
+
+ALTER TABLE lke_rekap
+    ALTER COLUMN user_id SET NOT NULL,
+    ALTER COLUMN id_opd SET DATA TYPE integer,
+    ALTER COLUMN tahun SET DATA TYPE integer,
+    ALTER COLUMN nilai_capaian SET DATA TYPE numeric,
+    ALTER COLUMN kelengkapan SET DATA TYPE numeric,
+    ALTER COLUMN predikat_akhir SET DATA TYPE character varying,
+    ALTER COLUMN predikat SET DATA TYPE character varying,
+    ALTER COLUMN status_evaluasi SET DATA TYPE character varying,
+    ALTER COLUMN id_verifikator SET DATA TYPE integer,
+    ALTER COLUMN id_ketua SET DATA TYPE integer,
+    ALTER COLUMN id_evaluator SET DATA TYPE integer,
+    ALTER COLUMN id_pengendali SET DATA TYPE integer,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
 
 ALTER TABLE lke_rekap OWNER TO postgres;
 
@@ -204,10 +234,62 @@ ALTER TABLE lke_rekap_id_seq OWNER TO postgres;
 ALTER SEQUENCE lke_rekap_id_seq OWNED BY lke_rekap.id;
 
 --
+-- Name: lke_rekomendasi; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE IF NOT EXISTS lke_rekomendasi (
+    id integer NOT NULL,
+    parent_id integer UNIQUE NOT NULL REFERENCES lke_rekap(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    ta1a text,
+    ta1b text,
+    ta1c text,
+    ta2a text,
+    ta2b text,
+    ta2c text,
+    tb1 text,
+    tb2 text,
+    tb3 text,
+    tc1 text,
+    tc2 text,
+    tc3 text,
+    td1 text,
+    td2 text,
+    td3 text,
+    updated_at integer,
+    created_at integer
+);
+
+ALTER TABLE lke_rekomendasi
+    ALTER COLUMN parent_id SET NOT NULL,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
+
+ALTER TABLE lke_rekomendasi OWNER TO postgres;
+
+--
+-- Name: lke_rekomendasi_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE lke_rekomendasi_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE lke_rekomendasi_id_seq OWNER TO postgres;
+
+--
+-- Name: lke_rekomendasi_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE lke_rekomendasi_id_seq OWNED BY lke_rekomendasi.id;
+
+--
 -- Name: lke_evaluasi; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE lke_evaluasi (
+CREATE TABLE IF NOT EXISTS lke_evaluasi (
     id integer NOT NULL,
     lke_rekap_id integer NOT NULL,
     user_id integer,
@@ -218,6 +300,16 @@ CREATE TABLE lke_evaluasi (
     updated_at integer,
     created_at integer
 );
+
+ALTER TABLE lke_evaluasi
+    ALTER COLUMN lke_rekap_id SET NOT NULL,
+    ALTER COLUMN user_id SET DATA TYPE integer,
+    ALTER COLUMN kode_evaluasi SET DATA TYPE character varying,
+    ALTER COLUMN jawaban SET DATA TYPE text,
+    ALTER COLUMN berkas SET DATA TYPE text,
+    ALTER COLUMN catatan SET DATA TYPE text,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
 
 ALTER TABLE lke_evaluasi OWNER TO postgres;
 
@@ -257,6 +349,12 @@ ALTER TABLE ONLY "user" ALTER COLUMN id SET DEFAULT nextval('user_id_seq'::regcl
 --
 
 ALTER TABLE ONLY lke_rekap ALTER COLUMN id SET DEFAULT nextval('lke_rekap_id_seq'::regclass);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY lke_rekomendasi ALTER COLUMN id SET DEFAULT nextval('lke_rekomendasi_id_seq'::regclass);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
@@ -312,6 +410,12 @@ ALTER TABLE ONLY lke_rekap
     ADD CONSTRAINT lke_rekap_id PRIMARY KEY (id);
 
 --
+-- Name: lke_rekomendasi_id; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace:
+--
+
+ALTER TABLE ONLY lke_rekomendasi
+    ADD CONSTRAINT lke_rekomendasi_id PRIMARY KEY (id);
+--
 -- Name: lke_evaluasi_id; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace:
 --
 
@@ -322,7 +426,7 @@ ALTER TABLE ONLY lke_evaluasi
 -- Name: lke_komponen; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
-CREATE TABLE lke_komponen (
+CREATE TABLE IF NOT EXISTS lke_komponen (
     id integer NOT NULL,
     kode_evaluasi character varying NOT NULL,
     bobot numeric NOT NULL,
@@ -332,6 +436,12 @@ CREATE TABLE lke_komponen (
     updated_at integer,
     created_at integer
 );
+
+ALTER TABLE lke_komponen
+    ALTER COLUMN kode_evaluasi SET NOT NULL,
+    ALTER COLUMN bobot SET NOT NULL,
+    ALTER COLUMN updated_at SET DATA TYPE integer,
+    ALTER COLUMN created_at SET DATA TYPE integer;
 
 ALTER TABLE lke_komponen OWNER TO postgres;
 
@@ -420,6 +530,12 @@ CREATE TRIGGER create_lke_evaluasi_created_at BEFORE INSERT ON lke_evaluasi FOR 
 CREATE TRIGGER create_lke_komponen_created_at BEFORE INSERT ON lke_komponen FOR EACH ROW EXECUTE PROCEDURE created_at_column();
 
 --
+-- Name: create_lke_rekomendasi_created_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER create_lke_rekomendasi_created_at BEFORE INSERT ON lke_rekomendasi FOR EACH ROW EXECUTE PROCEDURE created_at_column();
+
+--
 -- Name: user create_user_created_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -448,6 +564,12 @@ CREATE TRIGGER update_lke_evaluasi_updated_at BEFORE UPDATE ON lke_evaluasi FOR 
 --
 
 CREATE TRIGGER update_lke_komponen_updated_at BEFORE UPDATE ON lke_komponen FOR EACH ROW EXECUTE PROCEDURE update_at_column();
+
+--
+-- Name: update_lke_rekomendasi_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER update_lke_rekomendasi_updated_at BEFORE UPDATE ON lke_rekomendasi FOR EACH ROW EXECUTE PROCEDURE update_at_column();
 
 --
 -- Name: user update_user_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
