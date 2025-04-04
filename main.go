@@ -123,7 +123,8 @@ func main() {
 
 		v1.POST("/lke-rekap", TokenAuthMiddleware(), lkeRekap.Create)
 		v1.GET("/lke-rekaps", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekaps/:format", TokenAuthMiddleware(), lkeRekap.All)
+		v1.GET("/lke-rekaps/:tahun", TokenAuthMiddleware(), lkeRekap.All)
+		v1.GET("/lke-rekaps/:tahun/:format", TokenAuthMiddleware(), lkeRekap.All)
 		v1.GET("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.One)
 		v1.GET("/lke-rekap/:id/:format", TokenAuthMiddleware(), lkeRekap.One)
 		v1.PUT("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Update)
@@ -153,6 +154,17 @@ func main() {
 		v1.GET("/lke-komponen/:id/:format", TokenAuthMiddleware(), lkeKomponen.One)
 		v1.PUT("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Update)
 		v1.DELETE("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Delete)
+
+		/*** START LkeRekomendasi ***/
+		lkeRekomendasi := new(controllers.LkeRekomendasiController)
+
+		v1.POST("/lke-rekomendasi", TokenAuthMiddleware(), lkeRekomendasi.Create)
+		v1.GET("/lke-rekomendasis", TokenAuthMiddleware(), lkeRekomendasi.All)
+		v1.GET("/lke-rekomendasis/:format", TokenAuthMiddleware(), lkeRekomendasi.All)
+		v1.GET("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.One)
+		v1.GET("/lke-rekomendasi/:id/:format", TokenAuthMiddleware(), lkeRekomendasi.One)
+		v1.PUT("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.Update)
+		v1.DELETE("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.Delete)
 
 		v1.GET("/signed-url/:objectName", TokenAuthMiddleware(), func(c *gin.Context) {
 			objectName := c.Param("objectName")
