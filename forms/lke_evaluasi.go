@@ -14,6 +14,7 @@ type CreateLkeEvaluasiForm struct {
 	LkeRekapID   int64   `form:"lke_rekap_id" json:"lke_rekap_id" binding:"required"`
 	KodeEvaluasi string  `form:"kode_evaluasi" json:"kode_evaluasi" binding:"required,max=50"`
 	Jawaban      *string `form:"jawaban" json:"jawaban"`
+	Evaluasi     *string `form:"evaluasi" json:"evaluasi"`
 	Berkas       *string `form:"berkas" json:"berkas"`
 	Catatan      *string `form:"catatan" json:"catatan"`
 }
@@ -50,6 +51,19 @@ func (f LkeEvaluasiForm) Jawaban(tag string, errMsg ...string) (message string) 
 	case "required":
 		if len(errMsg) == 0 {
 			return "Please enter the jawaban"
+		}
+		return errMsg[0]
+	default:
+		return "Something went wrong, please try again later"
+	}
+}
+
+// Evaluasi ...
+func (f LkeEvaluasiForm) Evaluasi(tag string, errMsg ...string) (message string) {
+	switch tag {
+	case "required":
+		if len(errMsg) == 0 {
+			return "Please enter the evaluasi"
 		}
 		return errMsg[0]
 	default:
@@ -100,6 +114,8 @@ func (f LkeEvaluasiForm) Create(err error) string {
 				return f.KodeEvaluasi(err.Tag())
 			case "Jawaban":
 				return f.Jawaban(err.Tag())
+			case "Evaluasi":
+				return f.Evaluasi(err.Tag())
 			case "Berkas":
 				return f.Berkas(err.Tag())
 			case "Catatan":
@@ -131,6 +147,8 @@ func (f LkeEvaluasiForm) Update(err error) string {
 				return f.KodeEvaluasi(err.Tag())
 			case "Jawaban":
 				return f.Jawaban(err.Tag())
+			case "Evaluasi":
+				return f.Evaluasi(err.Tag())
 			case "Berkas":
 				return f.Berkas(err.Tag())
 			case "Catatan":

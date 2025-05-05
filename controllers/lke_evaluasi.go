@@ -18,6 +18,29 @@ type LkeEvaluasiController struct{}
 var lkeEvaluasiModel = new(models.LkeEvaluasiModel)
 var lkeEvaluasiForm = new(forms.LkeEvaluasiForm)
 
+// SyncEvaluasi duplicates jawaban into evaluasi for given lke_rekap_id
+func (ctrl LkeEvaluasiController) SyncEvaluasi(c *gin.Context) {
+	lkeRekapIDStr := c.Query("lke_rekap_id")
+	if lkeRekapIDStr == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "lke_rekap_id parameter is required"})
+		return
+	}
+
+	lkeRekapID, err := strconv.ParseInt(lkeRekapIDStr, 10, 64)
+	if err != nil || lkeRekapID == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Invalid lke_rekap_id parameter"})
+		return
+	}
+
+	err = lkeEvaluasiModel.SyncJawabanToEvaluasi(lkeRekapID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Failed to sync evaluasi", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully synced evaluasi from jawaban"})
+}
+
 // Create ...
 func (ctrl LkeEvaluasiController) Create(c *gin.Context) {
 	userID := getUserID(c)
