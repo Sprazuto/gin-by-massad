@@ -143,6 +143,7 @@ func main() {
 		v1.PUT("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Update)
 		v1.DELETE("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Delete)
 		v1.GET("/lke-evaluasi/signed-url/:lke_rekap_id/:kode_evaluasi", TokenAuthMiddleware(), lkeEvaluasi.GetSignedURL)
+		v1.GET("/lke-evaluasi/sync-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.SyncEvaluasi)
 
 		/*** START LkeKomponen ***/
 		lkeKomponen := new(controllers.LkeKomponenController)

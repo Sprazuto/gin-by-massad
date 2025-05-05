@@ -313,6 +313,9 @@ ALTER TABLE lke_evaluasi
 
 ALTER TABLE lke_evaluasi OWNER TO postgres;
 
+-- Add evaluasi column to lke_evaluasi table
+ALTER TABLE lke_evaluasi ADD COLUMN IF NOT EXISTS evaluasi text;
+
 --
 -- Name: lke_evaluasi_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --

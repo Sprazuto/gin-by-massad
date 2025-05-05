@@ -17,6 +17,7 @@ type LkeEvaluasi struct {
 	UserID         int64      `db:"user_id" json:"-"`
 	KodeEvaluasi   string     `db:"kode_evaluasi" json:"kode_evaluasi"`
 	Jawaban        NullString `db:"jawaban" json:"jawaban"`
+	Evaluasi       NullString `db:"evaluasi" json:"evaluasi"`
 	Berkas         NullString `db:"berkas" json:"berkas"`
 	Catatan        NullString `db:"catatan" json:"catatan"`
 	KomponenBobot  float64    `db:"komponen_bobot" json:"komponen_bobot"`
@@ -27,6 +28,15 @@ type LkeEvaluasi struct {
 	UpdatedAt int64    `db:"updated_at" json:"updated_at"`
 	CreatedAt int64    `db:"created_at" json:"created_at"`
 	User      *JSONRaw `db:"user" json:"user"`
+}
+
+func (m LkeEvaluasiModel) SyncJawabanToEvaluasi(lkeRekapID int64) error {
+	_, err := db.GetDB().Exec(`
+		UPDATE public.lke_evaluasi
+		SET evaluasi = jawaban
+		WHERE lke_rekap_id = $1
+	`, lkeRekapID)
+	return err
 }
 
 // LkeEvaluasiModel handles database operations
@@ -72,10 +82,10 @@ func (m LkeEvaluasiModel) Create(userID int64, form forms.CreateLkeEvaluasiForm)
 	err = db.GetDB().QueryRow(
 		`INSERT INTO public.lke_evaluasi(
 			lke_rekap_id, user_id, kode_evaluasi,
-			jawaban, berkas, catatan
-		) VALUES($1, $2, $3, $4, $5, $6) RETURNING id`,
+			jawaban, berkas, catatan, evaluasi
+		) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
 		form.LkeRekapID, userID, form.KodeEvaluasi,
-		form.Jawaban, form.Berkas, form.Catatan,
+		form.Jawaban, form.Berkas, form.Catatan, form.Evaluasi,
 	).Scan(&lkeEvaluasiID)
 	return lkeEvaluasiID, err
 }
@@ -145,6 +155,11 @@ func (m LkeEvaluasiModel) Update(userID int64, id int64, form forms.CreateLkeEva
 	if form.Jawaban != nil {
 		query += fmt.Sprintf(", jawaban=$%d", argCount)
 		args = append(args, *form.Jawaban)
+		argCount++
+	}
+	if form.Evaluasi != nil {
+		query += fmt.Sprintf(", evaluasi=$%d", argCount)
+		args = append(args, *form.Evaluasi)
 		argCount++
 	}
 	if form.Berkas != nil {
@@ -226,7 +241,7 @@ func (m LkeEvaluasiModel) CalculateNilaiCapaian(lkeRekapID int64) (float64, erro
 	var nilaiCapaian float64
 
 	rows, err := db.GetDB().Query(`
-		SELECT e.jawaban, k.bobot
+		SELECT e.evaluasi, k.bobot
 		FROM lke_evaluasi e
 		JOIN lke_komponen k ON e.kode_evaluasi = k.kode_evaluasi
 		WHERE e.lke_rekap_id = $1`, lkeRekapID)
@@ -236,13 +251,13 @@ func (m LkeEvaluasiModel) CalculateNilaiCapaian(lkeRekapID int64) (float64, erro
 	defer rows.Close()
 
 	for rows.Next() {
-		var jawaban string
+		var evaluasi string
 		var bobot float64
-		if err := rows.Scan(&jawaban, &bobot); err != nil {
+		if err := rows.Scan(&evaluasi, &bobot); err != nil {
 			continue
 		}
 
-		switch jawaban {
+		switch evaluasi {
 		case "Ya", "Sudah":
 			nilaiCapaian += bobot
 		case "Sebagian":
