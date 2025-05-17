@@ -216,8 +216,8 @@ func (m LkeEvaluasiModel) CalculateKelengkapan(lkeRekapID int64) (float64, error
 	var evalCount int
 	var komponenCount int
 
-	// Get count of lke_evaluasi for this rekap
-	err := db.GetDB().QueryRow("SELECT COUNT(*) FROM lke_evaluasi WHERE lke_rekap_id = $1", lkeRekapID).Scan(&evalCount)
+	// Get count of lke_evaluasi for this rekap based on evaluasi
+	err := db.GetDB().QueryRow("SELECT COUNT(*) FROM lke_evaluasi WHERE evaluasi IS NOT NULL AND lke_rekap_id = $1", lkeRekapID).Scan(&evalCount)
 	if err != nil {
 		return 0, err
 	}
@@ -244,7 +244,7 @@ func (m LkeEvaluasiModel) CalculateNilaiCapaian(lkeRekapID int64) (float64, erro
 		SELECT e.evaluasi, k.bobot
 		FROM lke_evaluasi e
 		JOIN lke_komponen k ON e.kode_evaluasi = k.kode_evaluasi
-		WHERE e.lke_rekap_id = $1`, lkeRekapID)
+		WHERE e.lke_rekap_id = $1 AND e.evaluasi IS NOT NULL`, lkeRekapID)
 	if err != nil {
 		return 0, err
 	}
@@ -270,6 +270,66 @@ func (m LkeEvaluasiModel) CalculateNilaiCapaian(lkeRekapID int64) (float64, erro
 	return nilaiCapaian, nil
 }
 
+// CalculateKelengkapanM calculates completeness percentage based on jawaban
+func (m LkeEvaluasiModel) CalculateKelengkapanM(lkeRekapID int64) (float64, error) {
+	var kelengkapan float64
+	var evalCount int
+	var komponenCount int
+
+	// Get count of lke_evaluasi for this rekap based on jawaban
+	err := db.GetDB().QueryRow("SELECT COUNT(*) FROM lke_evaluasi WHERE jawaban IS NOT NULL AND lke_rekap_id = $1", lkeRekapID).Scan(&evalCount)
+	if err != nil {
+		return 0, err
+	}
+
+	// Get count of lke_komponen with bobot > 0
+	err = db.GetDB().QueryRow("SELECT COUNT(*) FROM lke_komponen WHERE bobot > 0").Scan(&komponenCount)
+	if err != nil {
+		return 0, err
+	}
+
+	// Calculate kelengkapan
+	if komponenCount > 0 {
+		kelengkapan = (float64(evalCount) / float64(komponenCount)) * 100
+	}
+
+	return kelengkapan, nil
+}
+
+// CalculateNilaiCapaianM calculates achievement score based on jawaban
+func (m LkeEvaluasiModel) CalculateNilaiCapaianM(lkeRekapID int64) (float64, error) {
+	var nilaiCapaian float64
+
+	rows, err := db.GetDB().Query(`
+		SELECT e.jawaban, k.bobot
+		FROM lke_evaluasi e
+		JOIN lke_komponen k ON e.kode_evaluasi = k.kode_evaluasi
+		WHERE e.lke_rekap_id = $1 AND e.jawaban IS NOT NULL`, lkeRekapID)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var jawaban string
+		var bobot float64
+		if err := rows.Scan(&jawaban, &bobot); err != nil {
+			continue
+		}
+
+		switch jawaban {
+		case "Ya", "Sudah":
+			nilaiCapaian += bobot
+		case "Sebagian":
+			nilaiCapaian += bobot / 2
+		case "Belum", "Tidak":
+			nilaiCapaian += 0
+		}
+	}
+
+	return nilaiCapaian, nil
+}
+
 // UpdateRekapValues updates kelengkapan and nilai_capaian in lke_rekap
 func (m LkeEvaluasiModel) UpdateRekapValues(lkeRekapID int64) error {
 	kelengkapan, err := m.CalculateKelengkapan(lkeRekapID)
@@ -282,11 +342,25 @@ func (m LkeEvaluasiModel) UpdateRekapValues(lkeRekapID int64) error {
 		return fmt.Errorf("failed to calculate nilai_capaian: %w", err)
 	}
 
+	// Calculate kelengkapan_m and nilai_capaian_m similarly
+	kelengkapanM, err := m.CalculateKelengkapanM(lkeRekapID) // Adjust logic if needed
+	if err != nil {
+		return fmt.Errorf("failed to calculate kelengkapan_m: %w", err)
+	}
+
+	nilaiCapaianM, err := m.CalculateNilaiCapaianM(lkeRekapID) // Adjust logic if needed
+	if err != nil {
+		return fmt.Errorf("failed to calculate nilai_capaian_m: %w", err)
+	}
+
 	_, err = db.GetDB().Exec(`
 		UPDATE lke_rekap
-		SET kelengkapan = $1, nilai_capaian = $2
-		WHERE id = $3`,
-		kelengkapan, nilaiCapaian, lkeRekapID)
+		SET kelengkapan = $1, nilai_capaian = $2,
+		    kelengkapan_m = $3, nilai_capaian_m = $4
+		WHERE id = $5`,
+		kelengkapan, nilaiCapaian,
+		kelengkapanM, nilaiCapaianM,
+		lkeRekapID)
 	if err != nil {
 		return fmt.Errorf("failed to update lke_rekap: %w", err)
 	}
