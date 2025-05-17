@@ -16,10 +16,14 @@ type LkeRekap struct {
 	UserID         int64           `db:"user_id" json:"-"`
 	IDOPD          int64           `db:"id_opd" json:"id_opd"`
 	Tahun          int             `db:"tahun" json:"tahun"`
-	NilaiCapaian   float64         `db:"nilai_capaian" json:"nilai_capaian"`
-	Kelengkapan    float64         `db:"kelengkapan" json:"kelengkapan"`
-	PredikatAkhir  string          `db:"predikat_akhir" json:"predikat_akhir"`
-	Predikat       string          `db:"predikat" json:"predikat"`
+	Kelengkapan    NullFloat64     `db:"kelengkapan" json:"kelengkapan"`
+	NilaiCapaian   NullFloat64     `db:"nilai_capaian" json:"nilai_capaian"`
+	PredikatAkhir  NullString      `db:"predikat_akhir" json:"predikat_akhir"`
+	Predikat       NullString      `db:"predikat" json:"predikat"`
+	KelengkapanM   NullFloat64     `db:"kelengkapan_m" json:"kelengkapan_m"`
+	NilaiCapaianM  NullFloat64     `db:"nilai_capaian_m" json:"nilai_capaian_m"`
+	PredikatAkhirM NullString      `db:"predikat_akhir_m" json:"predikat_akhir_m"`
+	PredikatM      NullString      `db:"predikat_m" json:"predikat_m"`
 	StatusEvaluasi string          `db:"status_evaluasi" json:"status_evaluasi"`
 	IDVerifikator  NullInt64       `db:"id_verifikator" json:"id_verifikator"`
 	IDKetua        NullInt64       `db:"id_ketua" json:"id_ketua"`
@@ -40,11 +44,13 @@ func (m LkeRekapModel) Create(userID int64, form forms.CreateLkeRekapForm) (lkeR
 	err = db.GetDB().QueryRow(
 		`INSERT INTO public.lke_rekap(
 			user_id, id_opd, tahun, nilai_capaian, kelengkapan,
-			predikat_akhir, predikat, status_evaluasi,
+			predikat_akhir, predikat, kelengkapan_m, nilai_capaian_m, predikat_akhir_m, predikat_m,
+			status_evaluasi,
 			id_verifikator, id_ketua, id_evaluator, id_pengendali
-		) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
+		) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
 		userID, form.IDOPD, form.Tahun, form.NilaiCapaian, form.Kelengkapan,
-		form.PredikatAkhir, form.Predikat, form.StatusEvaluasi,
+		form.PredikatAkhir, form.Predikat, form.KelengkapanM, form.NilaiCapaianM, form.PredikatAkhirM, form.PredikatM,
+		form.StatusEvaluasi,
 		form.IDVerifikator, form.IDKetua, form.IDEvaluator, form.IDPengendali,
 	).Scan(&lkeRekapID)
 	return lkeRekapID, err
@@ -116,6 +122,26 @@ func (m LkeRekapModel) Update(userID int64, id int64, form forms.UpdateLkeRekapF
 	if form.Predikat != nil {
 		query += fmt.Sprintf(" predikat=$%d,", argCount)
 		args = append(args, *form.Predikat)
+		argCount++
+	}
+	if form.KelengkapanM != nil {
+		query += fmt.Sprintf(" kelengkapan_m=$%d,", argCount)
+		args = append(args, *form.KelengkapanM)
+		argCount++
+	}
+	if form.NilaiCapaianM != nil {
+		query += fmt.Sprintf(" nilai_capaian_m=$%d,", argCount)
+		args = append(args, *form.NilaiCapaianM)
+		argCount++
+	}
+	if form.PredikatAkhirM != nil {
+		query += fmt.Sprintf(" predikat_akhir_m=$%d,", argCount)
+		args = append(args, *form.PredikatAkhirM)
+		argCount++
+	}
+	if form.PredikatM != nil {
+		query += fmt.Sprintf(" predikat_m=$%d,", argCount)
+		args = append(args, *form.PredikatM)
 		argCount++
 	}
 	if form.StatusEvaluasi != nil {
@@ -193,10 +219,14 @@ func (m LkeRekapModel) OneWithEvaluasi(userID int64, idOPD int64, tahun int) (lk
 			defaultForm := forms.CreateLkeRekapForm{
 				IDOPD:          idOPD,
 				Tahun:          tahun,
-				NilaiCapaian:   0,
 				Kelengkapan:    0,
+				NilaiCapaian:   0,
 				PredikatAkhir:  "-",
 				Predikat:       "-",
+				NilaiCapaianM:  0,
+				KelengkapanM:   0,
+				PredikatAkhirM: "-",
+				PredikatM:      "-",
 				StatusEvaluasi: "Belum Dievaluasi",
 			}
 			_, err = m.Create(userID, defaultForm)
@@ -205,7 +235,7 @@ func (m LkeRekapModel) OneWithEvaluasi(userID int64, idOPD int64, tahun int) (lk
 			}
 
 			// Retry fetching the newly created record
-			err = db.GetDB().SelectOne(&lkeRekap, query, idOPD, tahun)
+			err = db.GetDB().SelectOne(&lkeRekap, query, userID, idOPD, tahun)
 			if err != nil {
 				return lkeRekap, err
 			}

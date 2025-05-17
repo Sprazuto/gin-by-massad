@@ -23,7 +23,7 @@ func (ns *NullString) Scan(value interface{}) error {
 	return nil
 }
 
-func (ns *NullString) MarshalJSON() ([]byte, error) {
+func (ns NullString) MarshalJSON() ([]byte, error) {
 	if !ns.Valid {
 		return []byte("null"), nil
 	}
@@ -64,5 +64,29 @@ func (ni *NullInt64) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	ni.Valid = true
+	return nil
+}
+
+type NullFloat64 struct {
+	sql.NullFloat64
+}
+
+func (nf NullFloat64) MarshalJSON() ([]byte, error) {
+	if !nf.Valid {
+		return []byte("null"), nil
+	}
+	return json.Marshal(nf.Float64)
+}
+
+func (nf *NullFloat64) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		nf.Float64, nf.Valid = 0, false
+		return nil
+	}
+
+	if err := json.Unmarshal(data, &nf.Float64); err != nil {
+		return err
+	}
+	nf.Valid = true
 	return nil
 }

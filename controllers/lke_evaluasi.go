@@ -38,6 +38,12 @@ func (ctrl LkeEvaluasiController) SyncEvaluasi(c *gin.Context) {
 		return
 	}
 
+	err = lkeEvaluasiModel.UpdateRekapValues(lkeRekapID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Failed to update rekap values", "error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully synced evaluasi from jawaban"})
 }
 

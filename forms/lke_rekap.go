@@ -13,10 +13,14 @@ type LkeRekapForm struct{}
 type CreateLkeRekapForm struct {
 	IDOPD          int64   `form:"id_opd" json:"id_opd" binding:"required"`
 	Tahun          int     `form:"tahun" json:"tahun" binding:"required"`
-	NilaiCapaian   float64 `form:"nilai_capaian" json:"nilai_capaian" binding:"required"`
 	Kelengkapan    float64 `form:"kelengkapan" json:"kelengkapan" binding:"required"`
+	NilaiCapaian   float64 `form:"nilai_capaian" json:"nilai_capaian" binding:"required"`
 	PredikatAkhir  string  `form:"predikat_akhir" json:"predikat_akhir" binding:"required,max=50"`
 	Predikat       string  `form:"predikat" json:"predikat" binding:"required,max=50"`
+	KelengkapanM   float64 `form:"kelengkapan_m" json:"kelengkapan_m" binding:"required"`
+	NilaiCapaianM  float64 `form:"nilai_capaian_m" json:"nilai_capaian_m" binding:"required"`
+	PredikatAkhirM string  `form:"predikat_akhir_m" json:"predikat_akhir_m" binding:"required,max=50"`
+	PredikatM      string  `form:"predikat_m" json:"predikat_m" binding:"required,max=50"`
 	StatusEvaluasi string  `form:"status_evaluasi" json:"status_evaluasi" binding:"required,max=50"`
 	IDVerifikator  int64   `form:"id_verifikator" json:"id_verifikator" binding:"required"`
 	IDKetua        int64   `form:"id_ketua" json:"id_ketua" binding:"required"`
@@ -28,10 +32,14 @@ type CreateLkeRekapForm struct {
 type UpdateLkeRekapForm struct {
 	IDOPD          *int64   `form:"id_opd" json:"id_opd"`
 	Tahun          *int     `form:"tahun" json:"tahun"`
-	NilaiCapaian   *float64 `form:"nilai_capaian" json:"nilai_capaian"`
 	Kelengkapan    *float64 `form:"kelengkapan" json:"kelengkapan"`
+	NilaiCapaian   *float64 `form:"nilai_capaian" json:"nilai_capaian"`
 	PredikatAkhir  *string  `form:"predikat_akhir" json:"predikat_akhir" binding:"omitempty,max=50"`
 	Predikat       *string  `form:"predikat" json:"predikat" binding:"omitempty,max=50"`
+	KelengkapanM   *float64 `form:"kelengkapan_m" json:"kelengkapan_m"`
+	NilaiCapaianM  *float64 `form:"nilai_capaian_m" json:"nilai_capaian_m"`
+	PredikatAkhirM *string  `form:"predikat_akhir_m" json:"predikat_akhir_m" binding:"omitempty,max=50"`
+	PredikatM      *string  `form:"predikat_m" json:"predikat_m" binding:"omitempty,max=50"`
 	StatusEvaluasi *string  `form:"status_evaluasi" json:"status_evaluasi" binding:"omitempty,max=50"`
 	IDVerifikator  *int64   `form:"id_verifikator" json:"id_verifikator"`
 	IDKetua        *int64   `form:"id_ketua" json:"id_ketua"`
