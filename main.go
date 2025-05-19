@@ -10,6 +10,7 @@ import (
 	"lke-app/controllers"
 	"lke-app/db"
 	"lke-app/forms"
+	"lke-app/helpers"
 	"lke-app/services"
 
 	"github.com/gin-contrib/gzip"
@@ -81,6 +82,7 @@ func main() {
 	r.Use(CORSMiddleware())
 	r.Use(RequestIDMiddleware())
 	r.Use(gzip.Gzip(gzip.DefaultCompression))
+	r.Use(helpers.LogAPIErrorMiddleware())
 
 	//Start PostgreSQL database
 	//Example: db.GetDB() - More info in the models folder
@@ -176,6 +178,11 @@ func main() {
 			}
 			c.JSON(http.StatusOK, gin.H{"signed_url": signedURL})
 		})
+
+		/*** START APP VERSION ***/
+		app := new(controllers.AppController)
+		v1.GET("/version", TokenAuthMiddleware(), app.Version)
+		v1.GET("/error-logs", TokenAuthMiddleware(), app.ErrorLogs)
 	}
 
 	r.LoadHTMLGlob("./public/html/*")
