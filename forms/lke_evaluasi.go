@@ -16,6 +16,7 @@ type CreateLkeEvaluasiForm struct {
 	Jawaban      *string `form:"jawaban" json:"jawaban"`
 	Evaluasi     *string `form:"evaluasi" json:"evaluasi"`
 	Berkas       *string `form:"berkas" json:"berkas"`
+	Pranala      *string `form:"pranala" json:"pranala"`
 	Catatan      *string `form:"catatan" json:"catatan"`
 }
 
@@ -97,6 +98,19 @@ func (f LkeEvaluasiForm) Catatan(tag string, errMsg ...string) (message string) 
 	}
 }
 
+// Pranala ...
+func (f LkeEvaluasiForm) Pranala(tag string, errMsg ...string) (message string) {
+	switch tag {
+	case "required":
+		if len(errMsg) == 0 {
+			return "Please enter the pranala URL"
+		}
+		return errMsg[0]
+	default:
+		return "Something went wrong, please try again later"
+	}
+}
+
 // Create ...
 func (f LkeEvaluasiForm) Create(err error) string {
 	switch err.(type) {
@@ -118,6 +132,8 @@ func (f LkeEvaluasiForm) Create(err error) string {
 				return f.Evaluasi(err.Tag())
 			case "Berkas":
 				return f.Berkas(err.Tag())
+			case "Pranala":
+				return f.Pranala(err.Tag())
 			case "Catatan":
 				return f.Catatan(err.Tag())
 			}
@@ -151,6 +167,8 @@ func (f LkeEvaluasiForm) Update(err error) string {
 				return f.Evaluasi(err.Tag())
 			case "Berkas":
 				return f.Berkas(err.Tag())
+			case "Pranala":
+				return f.Pranala(err.Tag())
 			case "Catatan":
 				return f.Catatan(err.Tag())
 			}
