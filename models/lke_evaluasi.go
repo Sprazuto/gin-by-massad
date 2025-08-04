@@ -19,6 +19,7 @@ type LkeEvaluasi struct {
 	Jawaban        NullString `db:"jawaban" json:"jawaban"`
 	Evaluasi       NullString `db:"evaluasi" json:"evaluasi"`
 	Berkas         NullString `db:"berkas" json:"berkas"`
+	Pranala        NullString `db:"pranala" json:"pranala"`
 	Catatan        NullString `db:"catatan" json:"catatan"`
 	KomponenBobot  float64    `db:"komponen_bobot" json:"komponen_bobot"`
 	KomponenNama   string     `db:"komponen_nama" json:"komponen_nama"`
@@ -82,10 +83,10 @@ func (m LkeEvaluasiModel) Create(userID int64, form forms.CreateLkeEvaluasiForm)
 	err = db.GetDB().QueryRow(
 		`INSERT INTO public.lke_evaluasi(
 			lke_rekap_id, user_id, kode_evaluasi,
-			jawaban, berkas, catatan, evaluasi
-		) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+			jawaban, berkas, pranala, catatan, evaluasi
+		) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
 		form.LkeRekapID, userID, form.KodeEvaluasi,
-		form.Jawaban, form.Berkas, form.Catatan, form.Evaluasi,
+		form.Jawaban, form.Berkas, form.Pranala, form.Catatan, form.Evaluasi,
 	).Scan(&lkeEvaluasiID)
 	return lkeEvaluasiID, err
 }
@@ -166,6 +167,15 @@ func (m LkeEvaluasiModel) Update(userID int64, id int64, form forms.CreateLkeEva
 		query += fmt.Sprintf(", berkas=$%d", argCount)
 		args = append(args, *form.Berkas)
 		argCount++
+	}
+	// Always update Pranala if present in request
+	if form.Pranala != nil {
+		query += fmt.Sprintf(", pranala=$%d", argCount)
+		args = append(args, *form.Pranala)
+		argCount++
+	} else {
+		// If Pranala is not in request, keep existing value
+		query += ", pranala=pranala"
 	}
 	// Always update Catatan if present in request
 	if form.Catatan != nil {
