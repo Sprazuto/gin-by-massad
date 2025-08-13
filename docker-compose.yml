@@ -1,7 +1,7 @@
 services:
   app:
-    container_name: lke-app
-    image: lke-app
+    container_name: aset-app
+    image: aset-app
     build:
       context: .
       dockerfile: Dockerfile

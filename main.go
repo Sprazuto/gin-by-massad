@@ -7,11 +7,11 @@ import (
 	"os"
 	"runtime"
 
-	"lke-app/controllers"
-	"lke-app/db"
-	"lke-app/forms"
-	"lke-app/helpers"
-	"lke-app/services"
+	"aset-app/controllers"
+	"aset-app/db"
+	"aset-app/forms"
+	"aset-app/helpers"
+	"aset-app/services"
 
 	"github.com/gin-contrib/gzip"
 	uuid "github.com/google/uuid"
@@ -120,54 +120,35 @@ func main() {
 		v1.PUT("/article/:id", TokenAuthMiddleware(), article.Update)
 		v1.DELETE("/article/:id", TokenAuthMiddleware(), article.Delete)
 
-		/*** START LkeRekap ***/
-		lkeRekap := new(controllers.LkeRekapController)
+		/*** START VehicleAsset ***/
+		vehicleAsset := new(controllers.VehicleAssetController)
 
-		v1.POST("/lke-rekap", TokenAuthMiddleware(), lkeRekap.Create)
-		v1.GET("/lke-rekaps", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekaps/:tahun", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekaps/:tahun/:format", TokenAuthMiddleware(), lkeRekap.All)
-		v1.GET("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.One)
-		v1.GET("/lke-rekap/:id/:format", TokenAuthMiddleware(), lkeRekap.One)
-		v1.PUT("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Update)
-		v1.DELETE("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Delete)
-		v1.GET("/lke-rekap/opd/:id_opd/tahun/:tahun", TokenAuthMiddleware(), lkeRekap.GetByOPDAndTahun)
+		// Vehicle asset routes
+		v1.POST("/vehicle-asset", TokenAuthMiddleware(), vehicleAsset.Create)
+		v1.PUT("/vehicle-asset/:id/upload-document", TokenAuthMiddleware(), vehicleAsset.UploadDocument)
+		v1.PATCH("/vehicle-asset/:id/verify-document", TokenAuthMiddleware(), vehicleAsset.VerifyDocument)
+		v1.DELETE("/vehicle-asset/:id/remove-document", TokenAuthMiddleware(), vehicleAsset.RemoveDocument)
+		v1.PUT("/vehicle-asset/:id/update-payment", TokenAuthMiddleware(), vehicleAsset.UpdatePayment)
+		v1.PUT("/vehicle-asset/:id/update-recommendation", TokenAuthMiddleware(), vehicleAsset.UpdateVehicleRecommendation)
+		v1.PUT("/vehicle-asset/:id", TokenAuthMiddleware(), vehicleAsset.Update)
+		v1.DELETE("/vehicle-asset/:id", TokenAuthMiddleware(), vehicleAsset.Delete)
 
-		/*** START LkeEvaluasi ***/
-		lkeEvaluasi := new(controllers.LkeEvaluasiController)
-
-		v1.POST("/lke-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.Create)
-		v1.PUT("/lke-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.Create)
-		v1.GET("/lke-evaluasis", TokenAuthMiddleware(), lkeEvaluasi.All)
-		v1.GET("/lke-evaluasis/:format", TokenAuthMiddleware(), lkeEvaluasi.All)
-		v1.GET("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.One)
-		v1.GET("/lke-evaluasi/:id/:format", TokenAuthMiddleware(), lkeEvaluasi.One)
-		v1.PUT("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Update)
-		v1.DELETE("/lke-evaluasi/:id", TokenAuthMiddleware(), lkeEvaluasi.Delete)
-		v1.GET("/lke-evaluasi/signed-url/:lke_rekap_id/:kode_evaluasi", TokenAuthMiddleware(), lkeEvaluasi.GetSignedURL)
-		v1.GET("/lke-evaluasi/sync-evaluasi", TokenAuthMiddleware(), lkeEvaluasi.SyncEvaluasi)
-
-		/*** START LkeKomponen ***/
-		lkeKomponen := new(controllers.LkeKomponenController)
-
-		v1.POST("/lke-komponen", TokenAuthMiddleware(), lkeKomponen.Create)
-		v1.GET("/lke-komponens", TokenAuthMiddleware(), lkeKomponen.All)
-		v1.GET("/lke-komponens/:format", TokenAuthMiddleware(), lkeKomponen.All)
-		v1.GET("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.One)
-		v1.GET("/lke-komponen/:id/:format", TokenAuthMiddleware(), lkeKomponen.One)
-		v1.PUT("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Update)
-		v1.DELETE("/lke-komponen/:id", TokenAuthMiddleware(), lkeKomponen.Delete)
-
-		/*** START LkeRekomendasi ***/
-		lkeRekomendasi := new(controllers.LkeRekomendasiController)
-
-		v1.POST("/lke-rekomendasi", TokenAuthMiddleware(), lkeRekomendasi.Create)
-		v1.GET("/lke-rekomendasis", TokenAuthMiddleware(), lkeRekomendasi.All)
-		v1.GET("/lke-rekomendasis/:format", TokenAuthMiddleware(), lkeRekomendasi.All)
-		v1.GET("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.One)
-		v1.GET("/lke-rekomendasi/:id/:format", TokenAuthMiddleware(), lkeRekomendasi.One)
-		v1.PUT("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.Update)
-		v1.DELETE("/lke-rekomendasi/:id", TokenAuthMiddleware(), lkeRekomendasi.Delete)
+		// Vehicle reference routes
+		v1.GET("/vehicle/wheels", TokenAuthMiddleware(), vehicleAsset.GetWheels)
+		v1.GET("/vehicle/models", TokenAuthMiddleware(), vehicleAsset.GetModels)
+		v1.GET("/vehicle/colors", TokenAuthMiddleware(), vehicleAsset.GetColors)
+		v1.GET("/vehicle/fuels", TokenAuthMiddleware(), vehicleAsset.GetFuels)
+		v1.GET("/vehicle/companies", TokenAuthMiddleware(), vehicleAsset.GetCompanies)
+		v1.GET("/vehicle/owning-types", TokenAuthMiddleware(), vehicleAsset.GetOwningTypes)
+		v1.GET("/vehicle/brands", TokenAuthMiddleware(), vehicleAsset.GetBrands)
+		v1.GET("/vehicle-assets", TokenAuthMiddleware(), vehicleAsset.GetAll)
+		v1.GET("/vehicle-assets/:format", TokenAuthMiddleware(), vehicleAsset.GetAll)
+		v1.GET("/vehicle-asset/:id", TokenAuthMiddleware(), vehicleAsset.Get)
+		v1.GET("/vehicle-asset/:id/:format", TokenAuthMiddleware(), vehicleAsset.Get)
+		v1.GET("/vehicle-asset/license/:plate", TokenAuthMiddleware(), vehicleAsset.GetByLicensePlate)
+		v1.GET("/vehicle-asset/company/:companyId", TokenAuthMiddleware(), vehicleAsset.GetByCompany)
+		v1.GET("/vehicle-asset/company/:companyId/summary", TokenAuthMiddleware(), vehicleAsset.GetCompanySummary)
+		v1.GET("/vehicle-assets/summary", TokenAuthMiddleware(), vehicleAsset.GetSummary)
 
 		v1.GET("/signed-url/:objectName", TokenAuthMiddleware(), func(c *gin.Context) {
 			objectName := c.Param("objectName")

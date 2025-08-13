@@ -6,10 +6,10 @@ import (
 	"os"
 	"strconv"
 
+	"aset-app/forms"
+	"aset-app/models"
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"lke-app/forms"
-	"lke-app/models"
 )
 
 // AuthController ...

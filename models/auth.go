@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"aset-app/db"
 	jwt "github.com/golang-jwt/jwt/v4"
 	uuid "github.com/google/uuid"
-	"lke-app/db"
 )
 
 // TokenDetails ...

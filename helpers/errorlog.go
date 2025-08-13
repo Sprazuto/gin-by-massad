@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"lke-app/db"
+	"aset-app/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"

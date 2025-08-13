@@ -15,10 +15,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"aset-app/controllers"
+	"aset-app/db"
+	"aset-app/forms"
 	"github.com/joho/godotenv"
-	"lke-app/controllers"
-	"lke-app/db"
-	"lke-app/forms"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

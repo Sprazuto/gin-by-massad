@@ -3,8 +3,8 @@ package models
 import (
 	"errors"
 
-	"lke-app/db"
-	"lke-app/forms"
+	"aset-app/db"
+	"aset-app/forms"
 )
 
 // Article ...

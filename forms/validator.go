@@ -10,7 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-//DefaultValidator ...
+// DefaultValidator ...
 type DefaultValidator struct {
 	once     sync.Once
 	validate *validator.Validate
@@ -18,7 +18,7 @@ type DefaultValidator struct {
 
 var _ binding.StructValidator = &DefaultValidator{}
 
-//ValidateStruct ...
+// ValidateStruct ...
 func (v *DefaultValidator) ValidateStruct(obj interface{}) error {
 
 	if kindOfData(obj) == reflect.Struct {
@@ -33,7 +33,7 @@ func (v *DefaultValidator) ValidateStruct(obj interface{}) error {
 	return nil
 }
 
-//Engine ...
+// Engine ...
 func (v *DefaultValidator) Engine() interface{} {
 	v.lazyinit()
 	return v.validate
@@ -49,6 +49,9 @@ func (v *DefaultValidator) lazyinit() {
 
 		//Custom rule for user full name
 		v.validate.RegisterValidation("fullName", ValidateFullName)
+
+		//Custom rule for numeric fields
+		v.validate.RegisterValidation("numeric", ValidateNumeric)
 	})
 }
 
@@ -63,7 +66,7 @@ func kindOfData(data interface{}) reflect.Kind {
 	return valueType
 }
 
-//ValidateFullName implements validator.Func
+// ValidateFullName implements validator.Func
 func ValidateFullName(fl validator.FieldLevel) bool {
 	//Remove the extra space
 	space := regexp.MustCompile(`\s+`)
@@ -74,5 +77,23 @@ func ValidateFullName(fl validator.FieldLevel) bool {
 
 	//To support all possible languages
 	matched, _ := regexp.Match(`^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;'"|=.,0123456789]{3,20}$`, []byte(name))
+	return matched
+}
+
+// ValidateNumeric implements validator.Func
+func ValidateNumeric(fl validator.FieldLevel) bool {
+	// Handle both string and numeric input
+	var str string
+	switch fl.Field().Kind() {
+	case reflect.String:
+		str = fl.Field().String()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+
+	// Check if string contains only digits
+	matched, _ := regexp.MatchString(`^[0-9]+$`, str)
 	return matched
 }

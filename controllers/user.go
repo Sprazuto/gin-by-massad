@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"lke-app/forms"
-	"lke-app/models"
+	"aset-app/forms"
+	"aset-app/models"
 
 	"net/http"
 

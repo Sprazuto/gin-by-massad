@@ -1,4 +1,4 @@
-module lke-app
+module aset-app
 
 go 1.23.0
 
