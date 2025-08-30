@@ -279,17 +279,25 @@ func (v *VehicleAsset) Get() error {
 	return err
 }
 
-// GetAllVehicleAssets retrieves all vehicle assets
+// GetAllVehicleAssets retrieves all vehicle assets with nested reference data
 func GetAllVehicleAssets() ([]VehicleAsset, error) {
-	var assets []VehicleAsset
-	query := `SELECT
+	// First get the base assets
+	var baseAssets []VehicleAsset
+	baseQuery := `SELECT
 		id, license_plate,
 		COALESCE(stnk_status, '') AS stnk_status,
 		COALESCE(bpkb_number, '') AS bpkb_number,
 		COALESCE(bpkb_status, '') AS bpkb_status,
 		COALESCE(chassis_number, '') AS chassis_number,
 		COALESCE(machine_number, '') AS machine_number,
-		type_name, wheels_id, model_id, color_id, fuel_id, owning_id, brand_id, cc_capacity,
+		type_name,
+		wheels_id,
+		model_id,
+		color_id,
+		fuel_id,
+		owning_id,
+		brand_id,
+		cc_capacity,
 		manufacture_year, tax_due_date, last_tax_payment_date,
 		COALESCE(current_owner, '') AS current_owner,
 		company_id,
@@ -310,8 +318,71 @@ func GetAllVehicleAssets() ([]VehicleAsset, error) {
 		created_at, updated_at, created_by
 		FROM vehicle_asset ORDER BY id DESC`
 
-	_, err := db.GetDB().Select(&assets, query)
-	return assets, err
+	_, err := db.GetDB().Select(&baseAssets, baseQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	// For each asset, get the nested objects if they exist
+	var fullAssets []VehicleAsset
+	for _, asset := range baseAssets {
+		// Get related objects only if the foreign key is valid
+		if asset.WheelsID.Valid {
+			wheelsData := VehicleWheels{ID: int(asset.WheelsID.Int64)}
+			if err := db.GetDB().SelectOne(&wheelsData, "SELECT * FROM vehicle_wheels WHERE id=$1", asset.WheelsID.Int64); err == nil {
+				asset.Wheels = &wheelsData
+			}
+		}
+
+		if asset.ModelID.Valid {
+			modelData := VehicleModel{ID: int(asset.ModelID.Int64)}
+			if err := db.GetDB().SelectOne(&modelData, "SELECT * FROM vehicle_model WHERE id=$1", asset.ModelID.Int64); err == nil {
+				asset.Model = &modelData
+			}
+		}
+
+		if asset.ColorID.Valid {
+			colorData := VehicleColor{ID: int(asset.ColorID.Int64)}
+			if err := db.GetDB().SelectOne(&colorData, "SELECT * FROM vehicle_color WHERE id=$1", asset.ColorID.Int64); err == nil {
+				asset.Color = &colorData
+			}
+		}
+
+		if asset.FuelID.Valid {
+			fuelData := VehicleFuel{ID: int(asset.FuelID.Int64)}
+			if err := db.GetDB().SelectOne(&fuelData, "SELECT * FROM vehicle_fuel WHERE id=$1", asset.FuelID.Int64); err == nil {
+				asset.Fuel = &fuelData
+			}
+		}
+
+		if asset.OwningID.Valid {
+			owningData := VehicleOwning{ID: int(asset.OwningID.Int64)}
+			if err := db.GetDB().SelectOne(&owningData, "SELECT * FROM vehicle_owning WHERE id=$1", asset.OwningID.Int64); err == nil {
+				asset.Owning = &owningData
+			}
+		}
+
+		if asset.BrandID.Valid {
+			brandData := VehicleBrand{ID: int(asset.BrandID.Int64)}
+			if err := db.GetDB().SelectOne(&brandData, "SELECT * FROM vehicle_brand WHERE id=$1", asset.BrandID.Int64); err == nil {
+				asset.Brand = &brandData
+			}
+		}
+
+		// Try to get company data if it exists locally (API integration flexibility)
+		companyData := UtilizationCompany{ID: asset.CompanyID}
+		if err := db.GetDB().SelectOne(&companyData, "SELECT * FROM utilization_company WHERE id=$1", asset.CompanyID); err == nil {
+			asset.Company = &companyData
+		}
+		// If company doesn't exist locally, Company remains nil - this is expected for API integration
+
+		// Ensure company_id is set for JSON response
+		asset.APICompanyID = asset.CompanyID
+
+		fullAssets = append(fullAssets, asset)
+	}
+
+	return fullAssets, nil
 }
 
 // Delete removes a vehicle asset
@@ -660,18 +731,26 @@ type ExecutiveViewData struct {
 	CompanyID         int    `db:"company_id" json:"company_id"`
 	CompanyName       string `db:"company_name" json:"company_name"`
 	TotalAssets       int    `db:"total_assets" json:"total_assets"`
-	PaidAssets        int    `db:"paid_assets" json:"paid_assets"`
-	UnpaidAssets      int    `db:"unpaid_assets" json:"unpaid_assets"`
+	UnreviewedAssets  int    `db:"unreviewed_assets" json:"unreviewed_assets"`
 	UncompletedAssets int    `db:"uncompleted_assets" json:"uncompleted_assets"`
+	UnverifiedAssets  int    `db:"unverified_assets" json:"unverified_assets"`
+	CompletedAssets   int    `db:"completed_assets" json:"completed_assets"`
+	UnsignedAssets    int    `db:"unsigned_assets" json:"unsigned_assets"`
+	UnpaidAssets      int    `db:"unpaid_assets" json:"unpaid_assets"`
+	PaidAssets        int    `db:"paid_assets" json:"paid_assets"`
 }
 
 // ExecutiveViewSummary represents the summary of all companies
 type ExecutiveViewSummary struct {
 	TotalCompanies    int `json:"total_companies"`
 	TotalAssets       int `json:"total_assets"`
-	PaidAssets        int `json:"paid_assets"`
-	UnpaidAssets      int `json:"unpaid_assets"`
+	UnreviewedAssets  int `json:"unreviewed_assets"`
 	UncompletedAssets int `json:"uncompleted_assets"`
+	UnverifiedAssets  int `json:"unverified_assets"`
+	CompletedAssets   int `json:"completed_assets"`
+	UnsignedAssets    int `json:"unsigned_assets"`
+	UnpaidAssets      int `json:"unpaid_assets"`
+	PaidAssets        int `json:"paid_assets"`
 }
 
 // GetExecutiveView retrieves executive view data grouped by company
@@ -682,15 +761,13 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 			va.company_id,
 			COALESCE(uc.name, 'Unknown') as company_name,
 			COUNT(va.id) as total_assets,
-			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets,
-			COUNT(CASE WHEN
-				(va.status = 'unpaid' OR va.status = 'unsigned')
-			THEN 1 END) as unpaid_assets,
-			COUNT(CASE WHEN
-				va.status = 'unreviewed' OR
-				va.status = 'uncompleted' OR
-				va.status = 'unverified'
-			THEN 1 END) as uncompleted_assets
+			COUNT(CASE WHEN va.status = 'unreviewed' THEN 1 END) as unreviewed_assets,
+			COUNT(CASE WHEN va.status = 'uncompleted' THEN 1 END) as uncompleted_assets,
+			COUNT(CASE WHEN va.status = 'unverified' THEN 1 END) as unverified_assets,
+			COUNT(CASE WHEN va.status = 'completed' THEN 1 END) as completed_assets,
+			COUNT(CASE WHEN va.status = 'unsigned' THEN 1 END) as unsigned_assets,
+			COUNT(CASE WHEN va.status = 'unpaid' THEN 1 END) as unpaid_assets,
+			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets
 		FROM vehicle_asset va
 		LEFT JOIN utilization_company uc ON va.company_id = uc.id
 		WHERE va.company_id IS NOT NULL AND va.company_id > 0
@@ -713,9 +790,13 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 			&data.CompanyID,
 			&data.CompanyName,
 			&data.TotalAssets,
-			&data.PaidAssets,
-			&data.UnpaidAssets,
+			&data.UnreviewedAssets,
 			&data.UncompletedAssets,
+			&data.UnverifiedAssets,
+			&data.CompletedAssets,
+			&data.UnsignedAssets,
+			&data.UnpaidAssets,
+			&data.PaidAssets,
 		)
 		if err != nil {
 			return nil, ExecutiveViewSummary{}, err
@@ -726,9 +807,13 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 		// Update summary
 		summary.TotalCompanies++
 		summary.TotalAssets += data.TotalAssets
-		summary.PaidAssets += data.PaidAssets
-		summary.UnpaidAssets += data.UnpaidAssets
+		summary.UnreviewedAssets += data.UnreviewedAssets
 		summary.UncompletedAssets += data.UncompletedAssets
+		summary.UnverifiedAssets += data.UnverifiedAssets
+		summary.CompletedAssets += data.CompletedAssets
+		summary.UnsignedAssets += data.UnsignedAssets
+		summary.UnpaidAssets += data.UnpaidAssets
+		summary.PaidAssets += data.PaidAssets
 	}
 
 	if err = rows.Err(); err != nil {
@@ -746,15 +831,13 @@ func GetCompanySummary(companyID int) (ExecutiveViewData, error) {
 			va.company_id,
 			COALESCE(uc.name, 'Unknown') as company_name,
 			COUNT(va.id) as total_assets,
-			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets,
-			COUNT(CASE WHEN
-				(va.status = 'unpaid' OR va.status = 'unsigned')
-			THEN 1 END) as unpaid_assets,
-			COUNT(CASE WHEN
-				va.status = 'unreviewed' OR
-				va.status = 'uncompleted' OR
-				va.status = 'unverified'
-			THEN 1 END) as uncompleted_assets
+			COUNT(CASE WHEN va.status = 'unreviewed' THEN 1 END) as unreviewed_assets,
+			COUNT(CASE WHEN va.status = 'uncompleted' THEN 1 END) as uncompleted_assets,
+			COUNT(CASE WHEN va.status = 'unverified' THEN 1 END) as unverified_assets,
+			COUNT(CASE WHEN va.status = 'completed' THEN 1 END) as completed_assets,
+			COUNT(CASE WHEN va.status = 'unsigned' THEN 1 END) as unsigned_assets,
+			COUNT(CASE WHEN va.status = 'unpaid' THEN 1 END) as unpaid_assets,
+			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets
 		FROM vehicle_asset va
 		LEFT JOIN utilization_company uc ON va.company_id = uc.id
 		WHERE va.company_id = $1

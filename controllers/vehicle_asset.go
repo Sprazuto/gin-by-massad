@@ -77,7 +77,52 @@ func (v *VehicleAssetController) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, assets)
+
+	// Format response for each asset
+	var response []gin.H
+	for _, asset := range assets {
+		response = append(response, gin.H{
+			"id":                           asset.ID,
+			"license_plate":                asset.LicensePlate,
+			"stnk_status":                  asset.STNKStatus,
+			"bpkb_number":                  asset.BPKBNumber,
+			"bpkb_status":                  asset.BPKBStatus,
+			"chassis_number":               asset.ChassisNumber,
+			"machine_number":               asset.MachineNumber,
+			"cc_capacity":                  nullInt64ToJSON(asset.CCCapacity),
+			"manufacture_year":             asset.ManufactureYear,
+			"tax_due_date":                 nullInt64ToJSON(asset.TaxDueDate),
+			"last_tax_payment_date":        nullInt64ToJSON(asset.LastTaxPaymentDate),
+			"current_owner":                asset.CurrentOwner,
+			"stnk_photo_path":              asset.STNKPhotoPath,
+			"stnk_photo_verified":          asset.STNKPhotoVerified,
+			"bpkb_photo_path":              asset.BPKBPhotoPath,
+			"bpkb_photo_verified":          asset.BPKBPhotoVerified,
+			"owner_id_photo_path":          asset.OwnerIDPhotoPath,
+			"owner_id_photo_verified":      asset.OwnerIDPhotoVerified,
+			"vehicle_photo_path":           asset.VehiclePhotoPath,
+			"vehicle_photo_verified":       asset.VehiclePhotoVerified,
+			"payment_billing_photo_path":   asset.PaymentBillingPhotoPath,
+			"payment_billing_date":         nullInt64ToJSON(asset.PaymentBillingDate),
+			"recommendation_document_path": asset.RecommendationDocPath,
+			"e_sign_status":                asset.ESignStatus,
+			"notes":                        asset.Notes,
+			"status":                       asset.Status,
+			"created_at":                   asset.CreatedAt,
+			"updated_at":                   asset.UpdatedAt,
+			"created_by":                   asset.CreatedBy,
+			"wheels":                       asset.Wheels,
+			"model":                        asset.Model,
+			"color":                        asset.Color,
+			"fuel":                         asset.Fuel,
+			"owning":                       asset.Owning,
+			"brand":                        asset.Brand,
+			"company":                      asset.Company,
+			"company_id":                   asset.CompanyID,
+			"type_name":                    asset.TypeName,
+		})
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 // Get returns a single vehicle asset
