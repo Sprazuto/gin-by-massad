@@ -28,13 +28,21 @@ func (ctrl LkeRekomendasiController) Create(c *gin.Context) {
 		return
 	}
 
-	id, err := lkeRekomendasiModel.Create(form)
+	id, isUpdate, err := lkeRekomendasiModel.Upsert(form)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"message": "Rekomendasi could not be created"})
+		if isUpdate {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"message": "Rekomendasi could not be updated"})
+		} else {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"message": "Rekomendasi could not be created"})
+		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Rekomendasi created", "id": id})
+	if isUpdate {
+		c.JSON(http.StatusOK, gin.H{"message": "Rekomendasi updated", "id": id})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "Rekomendasi created", "id": id})
+	}
 }
 
 // All ...

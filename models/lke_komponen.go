@@ -36,7 +36,7 @@ func (m LkeKomponenModel) One(id int64) (komponen LkeKomponen, err error) {
 
 // All ...
 func (m LkeKomponenModel) All() (komponen []LkeKomponen, err error) {
-	_, err = db.GetDB().Select(&komponen, "SELECT id, kode_evaluasi, bobot, komponen, eviden, level, created_at, updated_at FROM public.lke_komponen ORDER BY id DESC")
+	_, err = db.GetDB().Select(&komponen, "SELECT id, kode_evaluasi, bobot, komponen, eviden, level, created_at, updated_at FROM public.lke_komponen ORDER BY id ASC")
 	return komponen, err
 }
 
