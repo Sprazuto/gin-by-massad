@@ -18,7 +18,17 @@ type ArticleController struct{}
 var articleModel = new(models.ArticleModel)
 var articleForm = new(forms.ArticleForm)
 
-// Create ...
+// Create creates a new article
+// @Summary Create article
+// @Description Create a new article
+// @Tags Articles
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param createForm body forms.CreateArticleForm true "Article data"
+// @Success 200 {object} map[string]interface{} "Article created"
+// @Failure 406 {object} map[string]interface{} "Validation failed"
+// @Router /v1/article [post]
 func (ctrl ArticleController) Create(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -39,7 +49,15 @@ func (ctrl ArticleController) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Article created", "id": id})
 }
 
-// All ...
+// All retrieves all articles for the user
+// @Summary Get all articles
+// @Description Get all articles for the authenticated user
+// @Tags Articles
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "Articles list"
+// @Failure 406 {object} map[string]interface{} "Could not get articles"
+// @Router /v1/articles [get]
 func (ctrl ArticleController) All(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -64,7 +82,16 @@ func (ctrl ArticleController) All(c *gin.Context) {
 
 }
 
-// One ...
+// One retrieves a specific article by ID
+// @Summary Get article by ID
+// @Description Get a specific article by ID for the authenticated user
+// @Tags Articles
+// @Produce json
+// @Security Bearer
+// @Param id path int true "Article ID"
+// @Success 200 {object} map[string]interface{} "Article data"
+// @Failure 404 {object} map[string]interface{} "Article not found or invalid parameter"
+// @Router /v1/article/{id} [get]
 func (ctrl ArticleController) One(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -95,7 +122,19 @@ func (ctrl ArticleController) One(c *gin.Context) {
 	}
 }
 
-// Update ...
+// Update modifies an existing article
+// @Summary Update article
+// @Description Update an existing article by ID
+// @Tags Articles
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path int true "Article ID"
+// @Param updateForm body forms.CreateArticleForm true "Updated article data"
+// @Success 200 {object} map[string]interface{} "Article updated"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Validation failed or could not update"
+// @Router /v1/article/{id} [put]
 func (ctrl ArticleController) Update(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -124,7 +163,17 @@ func (ctrl ArticleController) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Article updated"})
 }
 
-// Delete ...
+// Delete removes an article by ID
+// @Summary Delete article
+// @Description Delete an article by ID
+// @Tags Articles
+// @Produce json
+// @Security Bearer
+// @Param id path int true "Article ID"
+// @Success 200 {object} map[string]interface{} "Article deleted"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Could not delete"
+// @Router /v1/article/{id} [delete]
 func (ctrl ArticleController) Delete(c *gin.Context) {
 	userID := getUserID(c)
 

@@ -19,6 +19,16 @@ var lkeEvaluasiModel = new(models.LkeEvaluasiModel)
 var lkeEvaluasiForm = new(forms.LkeEvaluasiForm)
 
 // SyncEvaluasi duplicates jawaban into evaluasi for given lke_rekap_id
+// @Summary Sync LKE Evaluasi
+// @Description Synchronize jawaban data into evaluasi records for the specified LKE Rekap ID
+// @Tags Used in E-Office, LKE Evaluasi
+// @Produce json
+// @Security Bearer
+// @Param lke_rekap_id query int true "LKE Rekap ID"
+// @Success 200 {object} map[string]interface{} "Successfully synced evaluasi from jawaban"
+// @Failure 400 {object} map[string]interface{} "Invalid lke_rekap_id parameter"
+// @Failure 500 {object} map[string]interface{} "Failed to sync evaluasi or update rekap values"
+// @Router /v1/lke-evaluasi/sync-evaluasi [get]
 func (ctrl LkeEvaluasiController) SyncEvaluasi(c *gin.Context) {
 	lkeRekapIDStr := c.Query("lke_rekap_id")
 	if lkeRekapIDStr == "" {
@@ -47,7 +57,21 @@ func (ctrl LkeEvaluasiController) SyncEvaluasi(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully synced evaluasi from jawaban"})
 }
 
-// Create ...
+// Create creates or updates an LKE Evaluasi record
+// @Summary Create or Update LKE Evaluasi
+// @Description Create a new LKE Evaluasi record or update existing one. Supports file upload for PUT requests.
+// @Tags Used in E-Office, LKE Evaluasi
+// @Accept json,multipart/form-data
+// @Produce json
+// @Security Bearer
+// @Param createForm body forms.CreateLkeEvaluasiForm true "LKE Evaluasi data"
+// @Param file formData file false "File to upload (for PUT requests only)"
+// @Success 200 {object} map[string]interface{} "LKE Evaluasi created or updated"
+// @Failure 400 {object} map[string]interface{} "File required for PUT or invalid request"
+// @Failure 406 {object} map[string]interface{} "Validation failed"
+// @Failure 500 {object} map[string]interface{} "Failed to upload file or update rekap values"
+// @Router /v1/lke-evaluasi [post]
+// @Router /v1/lke-evaluasi [put]
 func (ctrl LkeEvaluasiController) Create(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -96,7 +120,17 @@ func (ctrl LkeEvaluasiController) Create(c *gin.Context) {
 
 }
 
-// All ...
+// All retrieves all LKE Evaluasi records for the authenticated user
+// @Summary Get all LKE Evaluasi records
+// @Description Get all LKE Evaluasi records for the authenticated user
+// @Tags LKE Evaluasi
+// @Produce json,xml
+// @Security Bearer
+// @Param format path string false "Response format: json or xml (defaults to json)"
+// @Success 200 {object} map[string]interface{} "LKE Evaluasi records list"
+// @Failure 406 {object} map[string]interface{} "Could not get LKE Evaluasi records"
+// @Router /v1/lke-evaluasis [get]
+// @Router /v1/lke-evaluasis/{format} [get]
 func (ctrl LkeEvaluasiController) All(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -120,7 +154,18 @@ func (ctrl LkeEvaluasiController) All(c *gin.Context) {
 	}
 }
 
-// One ...
+// One retrieves a specific LKE Evaluasi record by ID
+// @Summary Get LKE Evaluasi by ID
+// @Description Get a specific LKE Evaluasi record by ID for the authenticated user
+// @Tags LKE Evaluasi
+// @Produce json,xml
+// @Security Bearer
+// @Param id path int true "LKE Evaluasi ID"
+// @Param format path string false "Response format: json or xml (defaults to json)"
+// @Success 200 {object} map[string]interface{} "LKE Evaluasi data"
+// @Failure 404 {object} map[string]interface{} "LKE Evaluasi not found or invalid parameter"
+// @Router /v1/lke-evaluasi/{id} [get]
+// @Router /v1/lke-evaluasi/{id}/{format} [get]
 func (ctrl LkeEvaluasiController) One(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -151,7 +196,19 @@ func (ctrl LkeEvaluasiController) One(c *gin.Context) {
 	}
 }
 
-// Update ...
+// Update modifies an existing LKE Evaluasi record
+// @Summary Update LKE Evaluasi
+// @Description Update an existing LKE Evaluasi record by ID
+// @Tags LKE Evaluasi
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Evaluasi ID"
+// @Param createForm body forms.CreateLkeEvaluasiForm true "Updated LKE Evaluasi data"
+// @Success 200 {object} map[string]interface{} "LKE Evaluasi updated"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Validation failed or could not update"
+// @Router /v1/lke-evaluasi/{id} [put]
 func (ctrl LkeEvaluasiController) Update(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -180,7 +237,17 @@ func (ctrl LkeEvaluasiController) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "LkeEvaluasi updated"})
 }
 
-// Delete ...
+// Delete removes an LKE Evaluasi record by ID
+// @Summary Delete LKE Evaluasi
+// @Description Delete an LKE Evaluasi record by ID
+// @Tags LKE Evaluasi
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Evaluasi ID"
+// @Success 200 {object} map[string]interface{} "LKE Evaluasi deleted"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Could not delete"
+// @Router /v1/lke-evaluasi/{id} [delete]
 func (ctrl LkeEvaluasiController) Delete(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -202,6 +269,18 @@ func (ctrl LkeEvaluasiController) Delete(c *gin.Context) {
 }
 
 // GetSignedURL returns a signed URL for the specified LkeRekapID and KodeEvaluasi
+// @Summary Get signed URL for LKE Evaluasi file
+// @Description Generate a signed URL to access a file associated with an LKE Evaluasi record
+// @Tags Used in E-Office, LKE Evaluasi
+// @Produce json
+// @Security Bearer
+// @Param lke_rekap_id path int true "LKE Rekap ID"
+// @Param kode_evaluasi path string true "Kode Evaluasi"
+// @Success 200 {object} map[string]interface{} "Signed URL for file access"
+// @Failure 400 {object} map[string]interface{} "Missing required parameters"
+// @Failure 404 {object} map[string]interface{} "Record not found"
+// @Failure 500 {object} map[string]interface{} "Failed to generate signed URL"
+// @Router /v1/lke-evaluasi/signed-url/{lke_rekap_id}/{kode_evaluasi} [get]
 func (ctrl LkeEvaluasiController) GetSignedURL(c *gin.Context) {
 	lkeRekapID := c.Param("lke_rekap_id")
 	kodeEvaluasi := c.Param("kode_evaluasi")

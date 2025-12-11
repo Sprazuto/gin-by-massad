@@ -19,7 +19,17 @@ type LkeRekapController struct{}
 var lkeRekapModel = new(models.LkeRekapModel)
 var lkeRekapForm = new(forms.LkeRekapForm)
 
-// Create ...
+// Create creates a new LKE Rekap record
+// @Summary Create LKE Rekap
+// @Description Create a new LKE (Lembar Kerja Efektivitas) Rekap record for the authenticated user
+// @Tags LKE Rekap
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param createForm body forms.CreateLkeRekapForm true "LKE Rekap data"
+// @Success 200 {object} map[string]interface{} "LKE Rekap created"
+// @Failure 406 {object} map[string]interface{} "Validation failed"
+// @Router /v1/lke-rekap [post]
 func (ctrl LkeRekapController) Create(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -40,7 +50,20 @@ func (ctrl LkeRekapController) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "LkeRekap created", "id": id})
 }
 
-// All ...
+// All retrieves all LKE Rekap records for the authenticated user
+// @Summary Get all LKE Rekap records
+// @Description Get all LKE Rekap records for the authenticated user, optionally filtered by year
+// @Tags Used in E-Office, LKE Rekap
+// @Produce json,xml
+// @Security Bearer
+// @Param tahun path int false "Year filter (defaults to current year - 1)"
+// @Param format path string false "Response format: json or xml (defaults to json)"
+// @Success 200 {object} map[string]interface{} "LKE Rekap records list"
+// @Failure 400 {object} map[string]interface{} "Invalid year parameter"
+// @Failure 406 {object} map[string]interface{} "Could not get LKE Rekap records"
+// @Router /v1/lke-rekaps [get]
+// @Router /v1/lke-rekaps/{tahun} [get]
+// @Router /v1/lke-rekaps/{tahun}/{format} [get]
 func (ctrl LkeRekapController) All(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -77,7 +100,18 @@ func (ctrl LkeRekapController) All(c *gin.Context) {
 	}
 }
 
-// One ...
+// One retrieves a specific LKE Rekap record by ID
+// @Summary Get LKE Rekap by ID
+// @Description Get a specific LKE Rekap record by ID for the authenticated user
+// @Tags Used in E-Office, LKE Rekap
+// @Produce json,xml
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Param format path string false "Response format: json or xml (defaults to json)"
+// @Success 200 {object} map[string]interface{} "LKE Rekap data"
+// @Failure 404 {object} map[string]interface{} "LKE Rekap not found or invalid parameter"
+// @Router /v1/lke-rekap/{id} [get]
+// @Router /v1/lke-rekap/{id}/{format} [get]
 func (ctrl LkeRekapController) One(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -108,7 +142,19 @@ func (ctrl LkeRekapController) One(c *gin.Context) {
 	}
 }
 
-// Update ...
+// Update modifies an existing LKE Rekap record
+// @Summary Update LKE Rekap
+// @Description Update an existing LKE Rekap record by ID
+// @Tags Used in E-Office, LKE Rekap
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Param updateForm body forms.UpdateLkeRekapForm true "Updated LKE Rekap data"
+// @Success 200 {object} map[string]interface{} "LKE Rekap updated"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Validation failed or could not update"
+// @Router /v1/lke-rekap/{id} [put]
 func (ctrl LkeRekapController) Update(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -137,7 +183,17 @@ func (ctrl LkeRekapController) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "LkeRekap updated"})
 }
 
-// Delete ...
+// Delete removes an LKE Rekap record by ID
+// @Summary Delete LKE Rekap
+// @Description Delete an LKE Rekap record by ID
+// @Tags LKE Rekap
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} map[string]interface{} "LKE Rekap deleted"
+// @Failure 404 {object} map[string]interface{} "Invalid parameter"
+// @Failure 406 {object} map[string]interface{} "Could not delete"
+// @Router /v1/lke-rekap/{id} [delete]
 func (ctrl LkeRekapController) Delete(c *gin.Context) {
 	userID := getUserID(c)
 
@@ -158,7 +214,17 @@ func (ctrl LkeRekapController) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "LkeRekap deleted"})
 }
 
-// GetByOPDAndTahun gets a lke_rekap record by id_opd and tahun with its evaluasi children
+// GetByOPDAndTahun gets a LKE Rekap record by OPD ID and year with its evaluasi children
+// @Summary Get LKE Rekap by OPD and Year
+// @Description Get a LKE Rekap record by OPD ID and year, including its evaluasi children records
+// @Tags Used in E-Office, LKE Rekap
+// @Produce json
+// @Security Bearer
+// @Param id_opd path int true "OPD ID"
+// @Param tahun path int true "Year"
+// @Success 200 {object} map[string]interface{} "LKE Rekap data with evaluasi children"
+// @Failure 404 {object} map[string]interface{} "LKE Rekap not found or invalid parameters"
+// @Router /v1/lke-rekap/opd/{id_opd}/tahun/{tahun} [get]
 func (ctrl LkeRekapController) GetByOPDAndTahun(c *gin.Context) {
 	userID := getUserID(c)
 

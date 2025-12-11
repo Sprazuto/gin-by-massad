@@ -1,0 +1,2423 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API for LKE (Lembar Kerja Evaluasi) Application - Indonesian Government Evaluation System",
+        "title": "LKE Application API",
+        "termsOfService": "http://swagger.io/terms",
+        "contact": {
+            "name": "API Support",
+            "email": "support@lke-app.com"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.4.11.11"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/v1/article": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Create article",
+                "parameters": [
+                    {
+                        "description": "Article data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateArticleForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/article/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific article by ID for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get article by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Article not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing article by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Update article",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated article data",
+                        "name": "updateForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateArticleForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed or could not update",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an article by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Delete article",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not delete",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/articles": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all articles for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get all articles",
+                "responses": {
+                    "200": {
+                        "description": "Articles list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get articles",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/error-logs": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve recent application error logs for debugging",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Get recent error logs",
+                "responses": {
+                    "200": {
+                        "description": "Recent error logs",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get error logs",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasi": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new LKE Evaluasi record or update existing one. Supports file upload for PUT requests.",
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Evaluasi"
+                ],
+                "summary": "Create or Update LKE Evaluasi",
+                "parameters": [
+                    {
+                        "description": "LKE Evaluasi data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeEvaluasiForm"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload (for PUT requests only)",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi created or updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "File required for PUT or invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to upload file or update rekap values",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new LKE Evaluasi record or update existing one. Supports file upload for PUT requests.",
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Evaluasi"
+                ],
+                "summary": "Create or Update LKE Evaluasi",
+                "parameters": [
+                    {
+                        "description": "LKE Evaluasi data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeEvaluasiForm"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload (for PUT requests only)",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi created or updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "File required for PUT or invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to upload file or update rekap values",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasi/signed-url/{lke_rekap_id}/{kode_evaluasi}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generate a signed URL to access a file associated with an LKE Evaluasi record",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Evaluasi"
+                ],
+                "summary": "Get signed URL for LKE Evaluasi file",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "lke_rekap_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Kode Evaluasi",
+                        "name": "kode_evaluasi",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Signed URL for file access",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to generate signed URL",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasi/sync-evaluasi": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Synchronize jawaban data into evaluasi records for the specified LKE Rekap ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Evaluasi"
+                ],
+                "summary": "Sync LKE Evaluasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "lke_rekap_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully synced evaluasi from jawaban",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid lke_rekap_id parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to sync evaluasi or update rekap values",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasi/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Evaluasi record by ID for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Get LKE Evaluasi by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Evaluasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Evaluasi not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing LKE Evaluasi record by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Update LKE Evaluasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Evaluasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated LKE Evaluasi data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeEvaluasiForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed or could not update",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an LKE Evaluasi record by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Delete LKE Evaluasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Evaluasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not delete",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasi/{id}/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Evaluasi record by ID for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Get LKE Evaluasi by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Evaluasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Evaluasi not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasis": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Evaluasi records for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Get all LKE Evaluasi records",
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Evaluasi records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-evaluasis/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Evaluasi records for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Evaluasi"
+                ],
+                "summary": "Get all LKE Evaluasi records",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Evaluasi records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Evaluasi records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-komponen": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new LKE (Lembar Kerja Efektivitas) Komponen record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Komponen"
+                ],
+                "summary": "Create LKE Komponen",
+                "parameters": [
+                    {
+                        "description": "LKE Komponen data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeKomponenForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-komponen/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Komponen record by ID",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Komponen"
+                ],
+                "summary": "Get LKE Komponen by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Komponen ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Komponen not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing LKE Komponen record by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Komponen"
+                ],
+                "summary": "Update LKE Komponen",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Komponen ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated LKE Komponen data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeKomponenForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed or could not update",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an LKE Komponen record by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Komponen"
+                ],
+                "summary": "Delete LKE Komponen",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Komponen ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not delete",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-komponen/{id}/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Komponen record by ID",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Komponen"
+                ],
+                "summary": "Get LKE Komponen by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Komponen ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Komponen not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-komponens": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Komponen records",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Komponen"
+                ],
+                "summary": "Get all LKE Komponen records",
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Komponen records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-komponens/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Komponen records",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Komponen"
+                ],
+                "summary": "Get all LKE Komponen records",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Komponen records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Komponen records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new LKE (Lembar Kerja Efektivitas) Rekap record for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap"
+                ],
+                "summary": "Create LKE Rekap",
+                "parameters": [
+                    {
+                        "description": "LKE Rekap data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeRekapForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/opd/{id_opd}/tahun/{tahun}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a LKE Rekap record by OPD ID and year, including its evaluasi children records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get LKE Rekap by OPD and Year",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "OPD ID",
+                        "name": "id_opd",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Year",
+                        "name": "tahun",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap data with evaluasi children",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Rekap not found or invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Rekap record by ID for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get LKE Rekap by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Rekap not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing LKE Rekap record by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Update LKE Rekap",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated LKE Rekap data",
+                        "name": "updateForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.UpdateLkeRekapForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed or could not update",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an LKE Rekap record by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap"
+                ],
+                "summary": "Delete LKE Rekap",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not delete",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Rekap record by ID for the authenticated user",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get LKE Rekap by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Rekap not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekaps": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Rekap records for the authenticated user, optionally filtered by year",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get all LKE Rekap records",
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid year parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Rekap records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekaps/{tahun}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Rekap records for the authenticated user, optionally filtered by year",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get all LKE Rekap records",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year filter (defaults to current year - 1)",
+                        "name": "tahun",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid year parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Rekap records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekaps/{tahun}/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Rekap records for the authenticated user, optionally filtered by year",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekap"
+                ],
+                "summary": "Get all LKE Rekap records",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year filter (defaults to current year - 1)",
+                        "name": "tahun",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekap records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid year parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Rekap records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekomendasi": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new LKE Rekomendasi record or update existing one based on parent_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Used in E-Office",
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Create or Update LKE Rekomendasi",
+                "parameters": [
+                    {
+                        "description": "LKE Rekomendasi data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeRekomendasiForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi created or updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekomendasi/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Rekomendasi record by ID",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Get LKE Rekomendasi by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekomendasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Rekomendasi not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an existing LKE Rekomendasi record by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Update LKE Rekomendasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekomendasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated LKE Rekomendasi data",
+                        "name": "createForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.CreateLkeRekomendasiForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed or could not update",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an LKE Rekomendasi record by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Delete LKE Rekomendasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekomendasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not delete",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekomendasi/{id}/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific LKE Rekomendasi record by ID",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Get LKE Rekomendasi by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekomendasi ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "LKE Rekomendasi not found or invalid parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekomendasis": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Rekomendasi records",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Get all LKE Rekomendasi records",
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Rekomendasi records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekomendasis/{format}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all LKE Rekomendasi records",
+                "produces": [
+                    "application/json",
+                    "text/xml"
+                ],
+                "tags": [
+                    "LKE Rekomendasi"
+                ],
+                "summary": "Get all LKE Rekomendasi records",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Response format: json or xml (defaults to json)",
+                        "name": "format",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LKE Rekomendasi records list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "406": {
+                        "description": "Could not get LKE Rekomendasi records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/token/refresh": {
+            "post": {
+                "description": "Refresh access token using refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh access token",
+                "parameters": [
+                    {
+                        "description": "Token refresh request",
+                        "name": "tokenForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully refreshed token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or expired token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/login": {
+            "post": {
+                "description": "Authenticate user and return access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "loginForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged in",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/logout": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Logout user and invalidate access token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User logout",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/register": {
+            "post": {
+                "description": "Register a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User registration",
+                "parameters": [
+                    {
+                        "description": "User registration data",
+                        "name": "registerForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.RegisterForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully registered",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or validation failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/version": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get current application version and patch information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Get application version",
+                "responses": {
+                    "200": {
+                        "description": "Application version information",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "forms.CreateArticleForm": {
+            "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 3
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                }
+            }
+        },
+        "forms.CreateLkeEvaluasiForm": {
+            "type": "object",
+            "required": [
+                "kode_evaluasi",
+                "lke_rekap_id"
+            ],
+            "properties": {
+                "berkas": {
+                    "type": "string"
+                },
+                "catatan": {
+                    "type": "string"
+                },
+                "evaluasi": {
+                    "type": "string"
+                },
+                "jawaban": {
+                    "type": "string"
+                },
+                "kode_evaluasi": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "lke_rekap_id": {
+                    "type": "integer"
+                },
+                "pranala": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.CreateLkeKomponenForm": {
+            "type": "object",
+            "required": [
+                "bobot",
+                "eviden",
+                "kode_evaluasi",
+                "komponen",
+                "level"
+            ],
+            "properties": {
+                "bobot": {
+                    "type": "number"
+                },
+                "eviden": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "kode_evaluasi": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                },
+                "komponen": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "level": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "forms.CreateLkeRekapForm": {
+            "type": "object",
+            "required": [
+                "id_evaluator",
+                "id_ketua",
+                "id_opd",
+                "id_pengendali",
+                "id_verifikator",
+                "kelengkapan",
+                "kelengkapan_m",
+                "nilai_capaian",
+                "nilai_capaian_m",
+                "predikat",
+                "predikat_akhir",
+                "predikat_akhir_m",
+                "predikat_m",
+                "status_evaluasi",
+                "tahun"
+            ],
+            "properties": {
+                "id_evaluator": {
+                    "type": "integer"
+                },
+                "id_ketua": {
+                    "type": "integer"
+                },
+                "id_opd": {
+                    "type": "integer"
+                },
+                "id_pengendali": {
+                    "type": "integer"
+                },
+                "id_verifikator": {
+                    "type": "integer"
+                },
+                "kelengkapan": {
+                    "type": "number"
+                },
+                "kelengkapan_m": {
+                    "type": "number"
+                },
+                "nilai_capaian": {
+                    "type": "number"
+                },
+                "nilai_capaian_m": {
+                    "type": "number"
+                },
+                "predikat": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_akhir": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_akhir_m": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_m": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "status_evaluasi": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "tahun": {
+                    "type": "integer"
+                }
+            }
+        },
+        "forms.CreateLkeRekomendasiForm": {
+            "type": "object",
+            "required": [
+                "parent_id"
+            ],
+            "properties": {
+                "parent_id": {
+                    "type": "integer"
+                },
+                "ta1a": {
+                    "type": "string"
+                },
+                "ta1b": {
+                    "type": "string"
+                },
+                "ta1c": {
+                    "type": "string"
+                },
+                "ta2a": {
+                    "type": "string"
+                },
+                "ta2b": {
+                    "type": "string"
+                },
+                "ta2c": {
+                    "type": "string"
+                },
+                "tb1": {
+                    "type": "string"
+                },
+                "tb2": {
+                    "type": "string"
+                },
+                "tb3": {
+                    "type": "string"
+                },
+                "tc1": {
+                    "type": "string"
+                },
+                "tc2": {
+                    "type": "string"
+                },
+                "tc3": {
+                    "type": "string"
+                },
+                "td1": {
+                    "type": "string"
+                },
+                "td2": {
+                    "type": "string"
+                },
+                "td3": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.LoginForm": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "forms.RegisterForm": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "description": "fullName rule is in validator.go",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                }
+            }
+        },
+        "forms.Token": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.UpdateLkeRekapForm": {
+            "type": "object",
+            "properties": {
+                "id_evaluator": {
+                    "type": "integer"
+                },
+                "id_ketua": {
+                    "type": "integer"
+                },
+                "id_opd": {
+                    "type": "integer"
+                },
+                "id_pengendali": {
+                    "type": "integer"
+                },
+                "id_verifikator": {
+                    "type": "integer"
+                },
+                "kelengkapan": {
+                    "type": "number"
+                },
+                "kelengkapan_m": {
+                    "type": "number"
+                },
+                "nilai_capaian": {
+                    "type": "number"
+                },
+                "nilai_capaian_m": {
+                    "type": "number"
+                },
+                "predikat": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_akhir": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_akhir_m": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "predikat_m": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "status_evaluasi": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "tahun": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

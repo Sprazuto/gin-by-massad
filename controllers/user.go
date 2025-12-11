@@ -9,7 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserController ...
+// UserController handles user authentication and management
+// @title User Controller
+// @version 1.0
+// @description User authentication and management endpoints
 type UserController struct{}
 
 var userModel = new(models.UserModel)
@@ -21,7 +24,17 @@ func getUserID(c *gin.Context) (userID int64) {
 	return c.MustGet("userID").(int64)
 }
 
-// Login ...
+// Login User
+// @Summary User login
+// @Description Authenticate user and return access token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param loginForm body forms.LoginForm true "Login credentials"
+// @Success 200 {object} map[string]interface{} "Successfully logged in"
+// @Failure 400 {object} map[string]interface{} "Invalid request"
+// @Failure 401 {object} map[string]interface{} "Invalid credentials"
+// @Router /v1/user/login [post]
 func (ctrl UserController) Login(c *gin.Context) {
 	var loginForm forms.LoginForm
 
@@ -40,7 +53,16 @@ func (ctrl UserController) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged in", "user": user, "token": token})
 }
 
-// Register ...
+// Register User
+// @Summary User registration
+// @Description Register a new user account
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param registerForm body forms.RegisterForm true "User registration data"
+// @Success 201 {object} map[string]interface{} "Successfully registered"
+// @Failure 400 {object} map[string]interface{} "Invalid request or validation failed"
+// @Router /v1/user/register [post]
 func (ctrl UserController) Register(c *gin.Context) {
 	var registerForm forms.RegisterForm
 
@@ -59,7 +81,15 @@ func (ctrl UserController) Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully registered", "user": user})
 }
 
-// Logout ...
+// Logout User
+// @Summary User logout
+// @Description Logout user and invalidate access token
+// @Tags Authentication
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} map[string]interface{} "Successfully logged out"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /v1/user/logout [get]
 func (ctrl UserController) Logout(c *gin.Context) {
 
 	au, err := authModel.ExtractTokenMetadata(c.Request)

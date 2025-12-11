@@ -9,6 +9,7 @@ import (
 
 	"lke-app/controllers"
 	"lke-app/db"
+	_ "lke-app/docs"
 	"lke-app/forms"
 	"lke-app/helpers"
 	"lke-app/services"
@@ -16,10 +17,31 @@ import (
 	"github.com/gin-contrib/gzip"
 	uuid "github.com/google/uuid"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
+
+// @title           LKE Application API
+// @version         1.4.11.11
+// @description     API for LKE (Lembar Kerja Evaluasi) Application - Indonesian Government Evaluation System
+// @termsOfService  http://swagger.io/terms
+
+// @contact.name   API Support
+// @contact.email  support@lke-app.com
+
+// @license.name  MIT License
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host          localhost:8080
+// @BasePath
+// @schemes        http https
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
 
 // CORSMiddleware ...
 // CORS (Cross-Origin Resource Sharing)
@@ -184,6 +206,8 @@ func main() {
 		v1.GET("/version", TokenAuthMiddleware(), app.Version)
 		v1.GET("/error-logs", TokenAuthMiddleware(), app.ErrorLogs)
 	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.LoadHTMLGlob("./public/html/*")
 

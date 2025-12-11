@@ -6,13 +6,17 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	jwt "github.com/golang-jwt/jwt/v4"
 	"lke-app/forms"
 	"lke-app/models"
+
+	"github.com/gin-gonic/gin"
+	jwt "github.com/golang-jwt/jwt/v4"
 )
 
-// AuthController ...
+// AuthController handles JWT token management
+// @title Auth Controller
+// @version 1.0
+// @description JWT token refresh and validation endpoints
 type AuthController struct{}
 
 var authModel = new(models.AuthModel)
@@ -38,7 +42,16 @@ func (ctl AuthController) TokenValid(c *gin.Context) {
 	c.Set("userID", userID)
 }
 
-// Refresh ...
+// Refresh Token
+// @Summary Refresh access token
+// @Description Refresh access token using refresh token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param tokenForm body forms.Token true "Token refresh request"
+// @Success 200 {object} map[string]string "Successfully refreshed token"
+// @Failure 401 {object} map[string]interface{} "Invalid or expired token"
+// @Router /v1/token/refresh [post]
 func (ctl AuthController) Refresh(c *gin.Context) {
 	var tokenForm forms.Token
 
