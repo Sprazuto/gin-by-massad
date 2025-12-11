@@ -1,0 +1,1621 @@
+definitions:
+  forms.CreateArticleForm:
+    properties:
+      content:
+        maxLength: 1000
+        minLength: 3
+        type: string
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  forms.CreateLkeEvaluasiForm:
+    properties:
+      berkas:
+        type: string
+      catatan:
+        type: string
+      evaluasi:
+        type: string
+      jawaban:
+        type: string
+      kode_evaluasi:
+        maxLength: 50
+        type: string
+      lke_rekap_id:
+        type: integer
+      pranala:
+        type: string
+    required:
+    - kode_evaluasi
+    - lke_rekap_id
+    type: object
+  forms.CreateLkeKomponenForm:
+    properties:
+      bobot:
+        type: number
+      eviden:
+        maxLength: 255
+        minLength: 3
+        type: string
+      kode_evaluasi:
+        maxLength: 50
+        minLength: 3
+        type: string
+      komponen:
+        maxLength: 255
+        minLength: 3
+        type: string
+      level:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - bobot
+    - eviden
+    - kode_evaluasi
+    - komponen
+    - level
+    type: object
+  forms.CreateLkeRekapForm:
+    properties:
+      id_evaluator:
+        type: integer
+      id_ketua:
+        type: integer
+      id_opd:
+        type: integer
+      id_pengendali:
+        type: integer
+      id_verifikator:
+        type: integer
+      kelengkapan:
+        type: number
+      kelengkapan_m:
+        type: number
+      nilai_capaian:
+        type: number
+      nilai_capaian_m:
+        type: number
+      predikat:
+        maxLength: 50
+        type: string
+      predikat_akhir:
+        maxLength: 50
+        type: string
+      predikat_akhir_m:
+        maxLength: 50
+        type: string
+      predikat_m:
+        maxLength: 50
+        type: string
+      status_evaluasi:
+        maxLength: 50
+        type: string
+      tahun:
+        type: integer
+    required:
+    - id_evaluator
+    - id_ketua
+    - id_opd
+    - id_pengendali
+    - id_verifikator
+    - kelengkapan
+    - kelengkapan_m
+    - nilai_capaian
+    - nilai_capaian_m
+    - predikat
+    - predikat_akhir
+    - predikat_akhir_m
+    - predikat_m
+    - status_evaluasi
+    - tahun
+    type: object
+  forms.CreateLkeRekomendasiForm:
+    properties:
+      parent_id:
+        type: integer
+      ta1a:
+        type: string
+      ta1b:
+        type: string
+      ta1c:
+        type: string
+      ta2a:
+        type: string
+      ta2b:
+        type: string
+      ta2c:
+        type: string
+      tb1:
+        type: string
+      tb2:
+        type: string
+      tb3:
+        type: string
+      tc1:
+        type: string
+      tc2:
+        type: string
+      tc3:
+        type: string
+      td1:
+        type: string
+      td2:
+        type: string
+      td3:
+        type: string
+    required:
+    - parent_id
+    type: object
+  forms.LoginForm:
+    properties:
+      email:
+        type: string
+      password:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  forms.RegisterForm:
+    properties:
+      email:
+        type: string
+      name:
+        description: fullName rule is in validator.go
+        maxLength: 20
+        minLength: 3
+        type: string
+      password:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  forms.Token:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  forms.UpdateLkeRekapForm:
+    properties:
+      id_evaluator:
+        type: integer
+      id_ketua:
+        type: integer
+      id_opd:
+        type: integer
+      id_pengendali:
+        type: integer
+      id_verifikator:
+        type: integer
+      kelengkapan:
+        type: number
+      kelengkapan_m:
+        type: number
+      nilai_capaian:
+        type: number
+      nilai_capaian_m:
+        type: number
+      predikat:
+        maxLength: 50
+        type: string
+      predikat_akhir:
+        maxLength: 50
+        type: string
+      predikat_akhir_m:
+        maxLength: 50
+        type: string
+      predikat_m:
+        maxLength: 50
+        type: string
+      status_evaluasi:
+        maxLength: 50
+        type: string
+      tahun:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@lke-app.com
+    name: API Support
+  description: API for LKE (Lembar Kerja Evaluasi) Application - Indonesian Government
+    Evaluation System
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms
+  title: LKE Application API
+  version: 1.4.11.11
+paths:
+  /v1/article:
+    post:
+      consumes:
+      - application/json
+      description: Create a new article
+      parameters:
+      - description: Article data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateArticleForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article created
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create article
+      tags:
+      - Articles
+  /v1/article/{id}:
+    delete:
+      description: Delete an article by ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not delete
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete article
+      tags:
+      - Articles
+    get:
+      description: Get a specific article by ID for the authenticated user
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Article not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get article by ID
+      tags:
+      - Articles
+    put:
+      consumes:
+      - application/json
+      description: Update an existing article by ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated article data
+        in: body
+        name: updateForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateArticleForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article updated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed or could not update
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update article
+      tags:
+      - Articles
+  /v1/articles:
+    get:
+      description: Get all articles for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Articles list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get articles
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all articles
+      tags:
+      - Articles
+  /v1/error-logs:
+    get:
+      description: Retrieve recent application error logs for debugging
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recent error logs
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to get error logs
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get recent error logs
+      tags:
+      - Application
+  /v1/lke-evaluasi:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Create a new LKE Evaluasi record or update existing one. Supports
+        file upload for PUT requests.
+      parameters:
+      - description: LKE Evaluasi data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeEvaluasiForm'
+      - description: File to upload (for PUT requests only)
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Evaluasi created or updated
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: File required for PUT or invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to upload file or update rekap values
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create or Update LKE Evaluasi
+      tags:
+      - Used in E-Office
+      - LKE Evaluasi
+    put:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Create a new LKE Evaluasi record or update existing one. Supports
+        file upload for PUT requests.
+      parameters:
+      - description: LKE Evaluasi data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeEvaluasiForm'
+      - description: File to upload (for PUT requests only)
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Evaluasi created or updated
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: File required for PUT or invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to upload file or update rekap values
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create or Update LKE Evaluasi
+      tags:
+      - Used in E-Office
+      - LKE Evaluasi
+  /v1/lke-evaluasi/{id}:
+    delete:
+      description: Delete an LKE Evaluasi record by ID
+      parameters:
+      - description: LKE Evaluasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Evaluasi deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not delete
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete LKE Evaluasi
+      tags:
+      - LKE Evaluasi
+    get:
+      description: Get a specific LKE Evaluasi record by ID for the authenticated
+        user
+      parameters:
+      - description: LKE Evaluasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Evaluasi data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Evaluasi not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Evaluasi by ID
+      tags:
+      - LKE Evaluasi
+    put:
+      consumes:
+      - application/json
+      description: Update an existing LKE Evaluasi record by ID
+      parameters:
+      - description: LKE Evaluasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated LKE Evaluasi data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeEvaluasiForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Evaluasi updated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed or could not update
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update LKE Evaluasi
+      tags:
+      - LKE Evaluasi
+  /v1/lke-evaluasi/{id}/{format}:
+    get:
+      description: Get a specific LKE Evaluasi record by ID for the authenticated
+        user
+      parameters:
+      - description: LKE Evaluasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Evaluasi data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Evaluasi not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Evaluasi by ID
+      tags:
+      - LKE Evaluasi
+  /v1/lke-evaluasi/signed-url/{lke_rekap_id}/{kode_evaluasi}:
+    get:
+      description: Generate a signed URL to access a file associated with an LKE Evaluasi
+        record
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: lke_rekap_id
+        required: true
+        type: integer
+      - description: Kode Evaluasi
+        in: path
+        name: kode_evaluasi
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Signed URL for file access
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Missing required parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Record not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to generate signed URL
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get signed URL for LKE Evaluasi file
+      tags:
+      - Used in E-Office
+      - LKE Evaluasi
+  /v1/lke-evaluasi/sync-evaluasi:
+    get:
+      description: Synchronize jawaban data into evaluasi records for the specified
+        LKE Rekap ID
+      parameters:
+      - description: LKE Rekap ID
+        in: query
+        name: lke_rekap_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully synced evaluasi from jawaban
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid lke_rekap_id parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to sync evaluasi or update rekap values
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Sync LKE Evaluasi
+      tags:
+      - Used in E-Office
+      - LKE Evaluasi
+  /v1/lke-evaluasis:
+    get:
+      description: Get all LKE Evaluasi records for the authenticated user
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Evaluasi records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Evaluasi records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Evaluasi records
+      tags:
+      - LKE Evaluasi
+  /v1/lke-evaluasis/{format}:
+    get:
+      description: Get all LKE Evaluasi records for the authenticated user
+      parameters:
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Evaluasi records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Evaluasi records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Evaluasi records
+      tags:
+      - LKE Evaluasi
+  /v1/lke-komponen:
+    post:
+      consumes:
+      - application/json
+      description: Create a new LKE (Lembar Kerja Efektivitas) Komponen record
+      parameters:
+      - description: LKE Komponen data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeKomponenForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Komponen created
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create LKE Komponen
+      tags:
+      - LKE Komponen
+  /v1/lke-komponen/{id}:
+    delete:
+      description: Delete an LKE Komponen record by ID
+      parameters:
+      - description: LKE Komponen ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Komponen deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not delete
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete LKE Komponen
+      tags:
+      - LKE Komponen
+    get:
+      description: Get a specific LKE Komponen record by ID
+      parameters:
+      - description: LKE Komponen ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Komponen data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Komponen not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Komponen by ID
+      tags:
+      - LKE Komponen
+    put:
+      consumes:
+      - application/json
+      description: Update an existing LKE Komponen record by ID
+      parameters:
+      - description: LKE Komponen ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated LKE Komponen data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeKomponenForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Komponen updated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed or could not update
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update LKE Komponen
+      tags:
+      - LKE Komponen
+  /v1/lke-komponen/{id}/{format}:
+    get:
+      description: Get a specific LKE Komponen record by ID
+      parameters:
+      - description: LKE Komponen ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Komponen data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Komponen not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Komponen by ID
+      tags:
+      - LKE Komponen
+  /v1/lke-komponens:
+    get:
+      description: Get all LKE Komponen records
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Komponen records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Komponen records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Komponen records
+      tags:
+      - Used in E-Office
+      - LKE Komponen
+  /v1/lke-komponens/{format}:
+    get:
+      description: Get all LKE Komponen records
+      parameters:
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Komponen records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Komponen records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Komponen records
+      tags:
+      - Used in E-Office
+      - LKE Komponen
+  /v1/lke-rekap:
+    post:
+      consumes:
+      - application/json
+      description: Create a new LKE (Lembar Kerja Efektivitas) Rekap record for the
+        authenticated user
+      parameters:
+      - description: LKE Rekap data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeRekapForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekap created
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create LKE Rekap
+      tags:
+      - LKE Rekap
+  /v1/lke-rekap/{id}:
+    delete:
+      description: Delete an LKE Rekap record by ID
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekap deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not delete
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete LKE Rekap
+      tags:
+      - LKE Rekap
+    get:
+      description: Get a specific LKE Rekap record by ID for the authenticated user
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekap data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Rekap not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Rekap by ID
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+    put:
+      consumes:
+      - application/json
+      description: Update an existing LKE Rekap record by ID
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated LKE Rekap data
+        in: body
+        name: updateForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.UpdateLkeRekapForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekap updated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed or could not update
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update LKE Rekap
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekap/{id}/{format}:
+    get:
+      description: Get a specific LKE Rekap record by ID for the authenticated user
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekap data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Rekap not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Rekap by ID
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekap/opd/{id_opd}/tahun/{tahun}:
+    get:
+      description: Get a LKE Rekap record by OPD ID and year, including its evaluasi
+        children records
+      parameters:
+      - description: OPD ID
+        in: path
+        name: id_opd
+        required: true
+        type: integer
+      - description: Year
+        in: path
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekap data with evaluasi children
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Rekap not found or invalid parameters
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Rekap by OPD and Year
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekaps:
+    get:
+      description: Get all LKE Rekap records for the authenticated user, optionally
+        filtered by year
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekap records list
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid year parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Rekap records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Rekap records
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekaps/{tahun}:
+    get:
+      description: Get all LKE Rekap records for the authenticated user, optionally
+        filtered by year
+      parameters:
+      - description: Year filter (defaults to current year - 1)
+        in: path
+        name: tahun
+        type: integer
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekap records list
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid year parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Rekap records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Rekap records
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekaps/{tahun}/{format}:
+    get:
+      description: Get all LKE Rekap records for the authenticated user, optionally
+        filtered by year
+      parameters:
+      - description: Year filter (defaults to current year - 1)
+        in: path
+        name: tahun
+        type: integer
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekap records list
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid year parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Rekap records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Rekap records
+      tags:
+      - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekomendasi:
+    post:
+      consumes:
+      - application/json
+      description: Create a new LKE Rekomendasi record or update existing one based
+        on parent_id
+      parameters:
+      - description: LKE Rekomendasi data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeRekomendasiForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekomendasi created or updated
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Create or Update LKE Rekomendasi
+      tags:
+      - Used in E-Office
+      - LKE Rekomendasi
+  /v1/lke-rekomendasi/{id}:
+    delete:
+      description: Delete an LKE Rekomendasi record by ID
+      parameters:
+      - description: LKE Rekomendasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekomendasi deleted
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not delete
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Delete LKE Rekomendasi
+      tags:
+      - LKE Rekomendasi
+    get:
+      description: Get a specific LKE Rekomendasi record by ID
+      parameters:
+      - description: LKE Rekomendasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekomendasi data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Rekomendasi not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Rekomendasi by ID
+      tags:
+      - LKE Rekomendasi
+    put:
+      consumes:
+      - application/json
+      description: Update an existing LKE Rekomendasi record by ID
+      parameters:
+      - description: LKE Rekomendasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated LKE Rekomendasi data
+        in: body
+        name: createForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateLkeRekomendasiForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LKE Rekomendasi updated
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Validation failed or could not update
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Update LKE Rekomendasi
+      tags:
+      - LKE Rekomendasi
+  /v1/lke-rekomendasi/{id}/{format}:
+    get:
+      description: Get a specific LKE Rekomendasi record by ID
+      parameters:
+      - description: LKE Rekomendasi ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekomendasi data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: LKE Rekomendasi not found or invalid parameter
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get LKE Rekomendasi by ID
+      tags:
+      - LKE Rekomendasi
+  /v1/lke-rekomendasis:
+    get:
+      description: Get all LKE Rekomendasi records
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekomendasi records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Rekomendasi records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Rekomendasi records
+      tags:
+      - LKE Rekomendasi
+  /v1/lke-rekomendasis/{format}:
+    get:
+      description: Get all LKE Rekomendasi records
+      parameters:
+      - description: 'Response format: json or xml (defaults to json)'
+        in: path
+        name: format
+        type: string
+      produces:
+      - application/json
+      - text/xml
+      responses:
+        "200":
+          description: LKE Rekomendasi records list
+          schema:
+            additionalProperties: true
+            type: object
+        "406":
+          description: Could not get LKE Rekomendasi records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get all LKE Rekomendasi records
+      tags:
+      - LKE Rekomendasi
+  /v1/token/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access token using refresh token
+      parameters:
+      - description: Token refresh request
+        in: body
+        name: tokenForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.Token'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully refreshed token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid or expired token
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh access token
+      tags:
+      - Authentication
+  /v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return access token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: loginForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.LoginForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged in
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User login
+      tags:
+      - Authentication
+  /v1/user/logout:
+    get:
+      description: Logout user and invalidate access token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged out
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: User logout
+      tags:
+      - Authentication
+  /v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: User registration data
+        in: body
+        name: registerForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.RegisterForm'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully registered
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User registration
+      tags:
+      - Authentication
+  /v1/version:
+    get:
+      description: Get current application version and patch information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Application version information
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get application version
+      tags:
+      - Application
+schemes:
+- http
+- https
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

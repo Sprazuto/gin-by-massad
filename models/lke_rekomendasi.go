@@ -31,10 +31,39 @@ type LkeRekomendasi struct {
 // LkeRekomendasiModel ...
 type LkeRekomendasiModel struct{}
 
+// GetByParentID ...
+func (m LkeRekomendasiModel) GetByParentID(parentID int64) (rekomendasi LkeRekomendasi, err error) {
+	err = db.GetDB().SelectOne(&rekomendasi, "SELECT id, parent_id, ta1a, ta1b, ta1c, ta2a, ta2b, ta2c, tb1, tb2, tb3, tc1, tc2, tc3, td1, td2, td3 FROM public.lke_rekomendasi WHERE parent_id=$1 LIMIT 1", parentID)
+	return rekomendasi, err
+}
+
 // Create ...
 func (m LkeRekomendasiModel) Create(form forms.CreateLkeRekomendasiForm) (rekomendasiID int64, err error) {
 	err = db.GetDB().QueryRow("INSERT INTO public.lke_rekomendasi(parent_id, ta1a, ta1b, ta1c, ta2a, ta2b, ta2c, tb1, tb2, tb3, tc1, tc2, tc3, td1, td2, td3) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id", form.ParentID, form.Ta1a, form.Ta1b, form.Ta1c, form.Ta2a, form.Ta2b, form.Ta2c, form.Tb1, form.Tb2, form.Tb3, form.Tc1, form.Tc2, form.Tc3, form.Td1, form.Td2, form.Td3).Scan(&rekomendasiID)
 	return rekomendasiID, err
+}
+
+// Upsert ...
+func (m LkeRekomendasiModel) Upsert(form forms.CreateLkeRekomendasiForm) (rekomendasiID int64, isUpdate bool, err error) {
+	// Check if record exists with the same parent_id
+	existing, err := m.GetByParentID(form.ParentID)
+	if err != nil {
+		// If no record found, create new one
+		if err.Error() == "sql: no rows in result set" {
+			rekomendasiID, err = m.Create(form)
+			return rekomendasiID, false, err
+		}
+		// Other errors
+		return 0, false, err
+	}
+
+	// Record exists, update it
+	err = m.Update(existing.ID, form)
+	if err != nil {
+		return 0, false, err
+	}
+
+	return existing.ID, true, nil
 }
 
 // One ...
