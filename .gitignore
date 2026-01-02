@@ -1,18 +1,92 @@
-
 # OS generated files #
 ######################
 .DS_Store
 .DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files #
+########################
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # Logs #
-######################
+########
 *.log
+logs/
+error.log
+access.log
 
-# SENSITVE DATA #
+# Sensitive data #
+##################
+.env*
 .gitconfig
-.env
 cert/
+secrets/
 
-# BUILD #
+# Build artifacts and binaries #
+#################################
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
 ./gin-boilerplate
 ./lke-app
+dist/
+build/
+
+# Dependencies #
+################
+vendor/
+go.work
+go.work.sum
+
+# Temporary files #
+###################
+*.tmp
+*.bak
+*.cache
+
+# Database files #
+##################
+*.db
+*.sqlite
+*.sqlite3
+db/*.db
+db/*.sqlite
+
+# Docker #
+##########
+docker-compose.override.yml
+.dockerignore
+
+# CI/CD #
+#########
+.travis.yml.cache/
+.github/workflows/cache/
+
+# Coverage and testing #
+########################
+coverage.html
+coverage.xml
+*.cover
+test-results/
+
+# Public and generated files #
+##############################
+public/uploads/
+public/temp/
+
+# Miscellaneous #
+#################
+README.html
+API_DOCUMENTATION.html

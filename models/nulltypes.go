@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
 )
 
@@ -89,4 +90,56 @@ func (nf *NullFloat64) UnmarshalJSON(data []byte) error {
 	}
 	nf.Valid = true
 	return nil
+}
+
+type NullStringSlice struct {
+	Slice []string
+	Valid bool
+}
+
+func (ns *NullStringSlice) Scan(value interface{}) error {
+	if value == nil {
+		ns.Slice, ns.Valid = nil, false
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		ns.Slice, ns.Valid = nil, false
+		return nil
+	}
+
+	if err := json.Unmarshal(bytes, &ns.Slice); err != nil {
+		ns.Slice, ns.Valid = nil, false
+		return err
+	}
+	ns.Valid = true
+	return nil
+}
+
+func (ns NullStringSlice) MarshalJSON() ([]byte, error) {
+	if !ns.Valid {
+		return []byte("null"), nil
+	}
+	return json.Marshal(ns.Slice)
+}
+
+func (ns *NullStringSlice) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		ns.Slice, ns.Valid = nil, false
+		return nil
+	}
+
+	if err := json.Unmarshal(data, &ns.Slice); err != nil {
+		return err
+	}
+	ns.Valid = true
+	return nil
+}
+
+func (ns NullStringSlice) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return json.Marshal(ns.Slice)
 }

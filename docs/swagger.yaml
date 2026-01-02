@@ -54,6 +54,10 @@ definitions:
         maxLength: 50
         minLength: 3
         type: string
+      options:
+        items:
+          type: string
+        type: array
     required:
     - bobot
     - eviden
@@ -227,7 +231,6 @@ definitions:
       tahun:
         type: integer
     type: object
-host: localhost:8080
 info:
   contact:
     email: support@lke-app.com
@@ -239,7 +242,7 @@ info:
     url: https://opensource.org/licenses/MIT
   termsOfService: http://swagger.io/terms
   title: LKE Application API
-  version: 1.4.11.11
+  version: 1.6.13
 paths:
   /v1/article:
     post:
