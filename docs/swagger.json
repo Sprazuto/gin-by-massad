@@ -16,9 +16,8 @@
             "name": "MIT License",
             "url": "https://opensource.org/licenses/MIT"
         },
-        "version": "1.4.11.11"
+        "version": "1.6.13"
     },
-    "host": "localhost:8080",
     "paths": {
         "/v1/article": {
             "post": {
@@ -2174,6 +2173,12 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 3
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

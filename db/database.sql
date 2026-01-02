@@ -514,6 +514,8 @@ SET DATA TYPE integer;
 
 ALTER TABLE lke_komponen OWNER TO postgres;
 
+ALTER TABLE lke_komponen ADD COLUMN IF NOT EXISTS options JSONB;
+
 --
 -- Name: lke_komponen_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --

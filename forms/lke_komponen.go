@@ -11,11 +11,12 @@ type LkeKomponenForm struct{}
 
 // CreateLkeKomponenForm ...
 type CreateLkeKomponenForm struct {
-	KodeEvaluasi string  `form:"kode_evaluasi" json:"kode_evaluasi" binding:"required,min=3,max=50"`
-	Bobot        float64 `form:"bobot" json:"bobot" binding:"required"`
-	Komponen     string  `form:"komponen" json:"komponen" binding:"required,min=3,max=255"`
-	Eviden       string  `form:"eviden" json:"eviden" binding:"required,min=3,max=255"`
-	Level        string  `form:"level" json:"level" binding:"required,min=3,max=50"`
+	KodeEvaluasi string   `form:"kode_evaluasi" json:"kode_evaluasi" binding:"required,min=3,max=50"`
+	Bobot        float64  `form:"bobot" json:"bobot" binding:"required"`
+	Komponen     string   `form:"komponen" json:"komponen" binding:"required,min=3,max=255"`
+	Eviden       string   `form:"eviden" json:"eviden" binding:"required,min=3,max=255"`
+	Level        string   `form:"level" json:"level" binding:"required,min=3,max=50"`
+	Options      []string `form:"options" json:"options"`
 }
 
 // KodeEvaluasi ...
@@ -91,6 +92,14 @@ func (f LkeKomponenForm) Level(tag string, errMsg ...string) (message string) {
 	}
 }
 
+// Options ...
+func (f LkeKomponenForm) Options(tag string, errMsg ...string) (message string) {
+	switch tag {
+	default:
+		return "Something went wrong, please try again later"
+	}
+}
+
 // Create ...
 func (f LkeKomponenForm) Create(err error) string {
 	switch err.(type) {
@@ -114,6 +123,9 @@ func (f LkeKomponenForm) Create(err error) string {
 			}
 			if err.Field() == "Level" {
 				return f.Level(err.Tag())
+			}
+			if err.Field() == "Options" {
+				return f.Options(err.Tag())
 			}
 		}
 

@@ -68,7 +68,7 @@ func (ctrl LkeRekapController) All(c *gin.Context) {
 	userID := getUserID(c)
 
 	format := c.Param("format")
-	year := c.Param("year")
+	year := c.Param("tahun")
 
 	var tahun int
 	if year == "" {

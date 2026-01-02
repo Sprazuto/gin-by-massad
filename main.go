@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 
 	"lke-app/controllers"
 	"lke-app/db"
@@ -25,7 +27,7 @@ import (
 )
 
 // @title           LKE Application API
-// @version         1.4.11.11
+// @version         1.6.13
 // @description     API for LKE (Lembar Kerja Evaluasi) Application - Indonesian Government Evaluation System
 // @termsOfService  http://swagger.io/terms
 
@@ -35,7 +37,6 @@ import (
 // @license.name  MIT License
 // @license.url   https://opensource.org/licenses/MIT
 
-// @host          localhost:8080
 // @BasePath
 // @schemes        http https
 
@@ -207,7 +208,31 @@ func main() {
 		v1.GET("/error-logs", TokenAuthMiddleware(), app.ErrorLogs)
 	}
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	swaggerHandler := ginSwagger.WrapHandler(swaggerFiles.Handler)
+	r.GET("/swagger/*any", func(c *gin.Context) {
+		if strings.HasSuffix(c.Request.URL.Path, "/doc.json") {
+			data, err := os.ReadFile("docs/swagger.json")
+			if err != nil {
+				c.AbortWithStatus(500)
+				return
+			}
+			var spec map[string]interface{}
+			if err := json.Unmarshal(data, &spec); err != nil {
+				c.AbortWithStatus(500)
+				return
+			}
+			spec["host"] = c.Request.Host
+			modified, err := json.Marshal(spec)
+			if err != nil {
+				c.AbortWithStatus(500)
+				return
+			}
+			c.Header("Content-Type", "application/json")
+			c.String(200, string(modified))
+		} else {
+			swaggerHandler(c)
+		}
+	})
 
 	r.LoadHTMLGlob("./public/html/*")
 
