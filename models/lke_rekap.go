@@ -250,7 +250,8 @@ func (m LkeRekapModel) OneWithEvaluasi(userID int64, idOPD int64, tahun int) (lk
 		       k.bobot as komponen_bobot,
 		       k.komponen as komponen_nama,
 		       k.eviden as komponen_eviden,
-		       k.level as komponen_level
+		       k.level as komponen_level,
+		       CASE WHEN e.evaluasi IS NOT NULL AND e.evaluasi IN ('Ya', 'Sudah') THEN k.bobot WHEN e.evaluasi = 'Sebagian' THEN k.bobot / 2 ELSE 0 END AS capaian
 		FROM public.lke_evaluasi e
 		LEFT JOIN public.lke_komponen k ON e.kode_evaluasi = k.kode_evaluasi
 		WHERE e.lke_rekap_id=$1`,
