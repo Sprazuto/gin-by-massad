@@ -21,6 +21,7 @@ type LkeEvaluasi struct {
 	Berkas         NullString `db:"berkas" json:"berkas"`
 	Pranala        NullString `db:"pranala" json:"pranala"`
 	Catatan        NullString `db:"catatan" json:"catatan"`
+	Capaian        float64    `db:"capaian" json:"capaian"`
 	KomponenBobot  float64    `db:"komponen_bobot" json:"komponen_bobot"`
 	KomponenNama   string     `db:"komponen_nama" json:"komponen_nama"`
 	KomponenEviden string     `db:"komponen_eviden" json:"komponen_eviden"`

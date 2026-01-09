@@ -27,7 +27,7 @@ import (
 )
 
 // @title           LKE Application API
-// @version         1.6.13
+// @version         1.6.14
 // @description     API for LKE (Lembar Kerja Evaluasi) Application - Indonesian Government Evaluation System
 // @termsOfService  http://swagger.io/terms
 
