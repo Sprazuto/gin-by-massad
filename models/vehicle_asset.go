@@ -119,6 +119,7 @@ type VehicleAsset struct {
 	ESignStatus             bool          `db:"e_sign_status" json:"e_sign_status"`
 	Notes                   string        `db:"notes" json:"notes"`
 	Status                  string        `db:"status" json:"status"`
+	ManualStatusOverride    bool          `db:"manual_status_override" json:"manual_status_override"`
 	CreatedAt               int           `db:"created_at" json:"created_at"`
 	UpdatedAt               int           `db:"updated_at" json:"updated_at"`
 	CreatedBy               int           `db:"created_by" json:"created_by"`
@@ -243,33 +244,34 @@ func (v *VehicleAsset) Update() error {
 // Get retrieves a vehicle asset by ID
 func (v *VehicleAsset) Get() error {
 	query := `
-		SELECT
-			id, license_plate,
-			COALESCE(stnk_status, '') AS stnk_status,
-			COALESCE(bpkb_number, '') AS bpkb_number,
-			COALESCE(bpkb_status, '') AS bpkb_status,
-			COALESCE(chassis_number, '') AS chassis_number,
-			COALESCE(machine_number, '') AS machine_number,
-			type_name, wheels_id, model_id, color_id, fuel_id, owning_id, brand_id, cc_capacity,
-			manufacture_year, tax_due_date, last_tax_payment_date,
-			COALESCE(current_owner, '') AS current_owner,
-			company_id,
-			COALESCE(stnk_photo_path, '') AS stnk_photo_path,
-			stnk_photo_verified,
-			COALESCE(bpkb_photo_path, '') AS bpkb_photo_path,
-			bpkb_photo_verified,
-			COALESCE(owner_id_photo_path, '') AS owner_id_photo_path,
-			owner_id_photo_verified,
-			COALESCE(vehicle_photo_path, '') AS vehicle_photo_path,
-			vehicle_photo_verified,
-			COALESCE(payment_billing_photo_path, '') AS payment_billing_photo_path,
-			payment_billing_date,
-			COALESCE(recommendation_document_path, '') AS recommendation_document_path,
-			e_sign_status,
-			COALESCE(notes, '') AS notes,
-			COALESCE(status, '') AS status,
-			created_at, updated_at, created_by
-		FROM vehicle_asset WHERE id=$1`
+	SELECT
+		id, license_plate,
+		COALESCE(stnk_status, '') AS stnk_status,
+		COALESCE(bpkb_number, '') AS bpkb_number,
+		COALESCE(bpkb_status, '') AS bpkb_status,
+		COALESCE(chassis_number, '') AS chassis_number,
+		COALESCE(machine_number, '') AS machine_number,
+		type_name, wheels_id, model_id, color_id, fuel_id, owning_id, brand_id, cc_capacity,
+		manufacture_year, tax_due_date, last_tax_payment_date,
+		COALESCE(current_owner, '') AS current_owner,
+		company_id,
+		COALESCE(stnk_photo_path, '') AS stnk_photo_path,
+		stnk_photo_verified,
+		COALESCE(bpkb_photo_path, '') AS bpkb_photo_path,
+		bpkb_photo_verified,
+		COALESCE(owner_id_photo_path, '') AS owner_id_photo_path,
+		owner_id_photo_verified,
+		COALESCE(vehicle_photo_path, '') AS vehicle_photo_path,
+		vehicle_photo_verified,
+		COALESCE(payment_billing_photo_path, '') AS payment_billing_photo_path,
+		payment_billing_date,
+		COALESCE(recommendation_document_path, '') AS recommendation_document_path,
+		e_sign_status,
+		COALESCE(notes, '') AS notes,
+		COALESCE(status, '') AS status,
+		manual_status_override,
+		created_at, updated_at, created_by
+	FROM vehicle_asset WHERE id=$1`
 
 	err := db.GetDB().SelectOne(v, query, v.ID)
 
@@ -315,6 +317,7 @@ func GetAllVehicleAssets() ([]VehicleAsset, error) {
 		e_sign_status,
 		COALESCE(notes, '') AS notes,
 		COALESCE(status, '') AS status,
+		manual_status_override,
 		created_at, updated_at, created_by
 		FROM vehicle_asset ORDER BY id DESC`
 
@@ -465,11 +468,13 @@ func (v *VehicleAsset) UpdatePayment(newTaxDueDate int) error {
 	paymentBillingDate := sql.NullInt64{Int64: int64(now), Valid: true}
 
 	// Update the payment-related fields
+	// Reset manual_status_override to FALSE when tax is paid for next year
 	query := `UPDATE vehicle_asset SET
 		last_tax_payment_date = $1,
 		tax_due_date = $2,
 		payment_billing_date = $3,
 		status = $4,
+		manual_status_override = FALSE,
 		updated_at = $5
 	WHERE id = $6`
 
@@ -482,6 +487,7 @@ func (v *VehicleAsset) UpdatePayment(newTaxDueDate int) error {
 		v.TaxDueDate = newTaxDueDateNull
 		v.PaymentBillingDate = paymentBillingDate
 		v.Status = "paid"
+		v.ManualStatusOverride = false
 	}
 
 	return err
@@ -499,6 +505,7 @@ func (v *VehicleAsset) UpdateRecommendation() error {
 		status = $4,
 		stnk_status = $5,
 		bpkb_status = $6,
+		manual_status_override = TRUE,
 		updated_at = $7
 	WHERE id = $8`
 
@@ -593,6 +600,7 @@ func (v *VehicleAsset) GetByCompany() ([]VehicleAsset, error) {
 		e_sign_status,
 		COALESCE(notes, '') AS notes,
 		COALESCE(status, '') AS status,
+		manual_status_override,
 		created_at, updated_at, created_by
 		FROM vehicle_asset WHERE company_id=$1 ORDER BY id`
 
@@ -738,6 +746,8 @@ type ExecutiveViewData struct {
 	UnsignedAssets    int    `db:"unsigned_assets" json:"unsigned_assets"`
 	UnpaidAssets      int    `db:"unpaid_assets" json:"unpaid_assets"`
 	PaidAssets        int    `db:"paid_assets" json:"paid_assets"`
+	DueAssets         int    `db:"due_assets" json:"due_assets"`
+	OverdueAssets     int    `db:"overdue_assets" json:"overdue_assets"`
 }
 
 // ExecutiveViewSummary represents the summary of all companies
@@ -751,10 +761,15 @@ type ExecutiveViewSummary struct {
 	UnsignedAssets    int `json:"unsigned_assets"`
 	UnpaidAssets      int `json:"unpaid_assets"`
 	PaidAssets        int `json:"paid_assets"`
+	DueAssets         int `json:"due_assets"`
+	OverdueAssets     int `json:"overdue_assets"`
 }
 
 // GetExecutiveView retrieves executive view data grouped by company
 func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
+	now := time.Now().Unix()
+	threeMonthsFromNow := now + (3 * 30 * 24 * 60 * 60) // Approximate 3 months in seconds
+
 	// Query to get grouped data by company
 	query := `
 		SELECT
@@ -767,7 +782,9 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 			COUNT(CASE WHEN va.status = 'completed' THEN 1 END) as completed_assets,
 			COUNT(CASE WHEN va.status = 'unsigned' THEN 1 END) as unsigned_assets,
 			COUNT(CASE WHEN va.status = 'unpaid' THEN 1 END) as unpaid_assets,
-			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets
+			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets,
+			COUNT(CASE WHEN va.tax_due_date IS NOT NULL AND va.tax_due_date <= $1 THEN 1 END) as due_assets,
+			COUNT(CASE WHEN va.tax_due_date IS NOT NULL AND va.tax_due_date < $2 THEN 1 END) as overdue_assets
 		FROM vehicle_asset va
 		LEFT JOIN utilization_company uc ON va.company_id = uc.id
 		WHERE va.company_id IS NOT NULL AND va.company_id > 0
@@ -775,7 +792,7 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 		ORDER BY uc.name NULLS LAST
 	`
 
-	rows, err := db.GetDB().Query(query)
+	rows, err := db.GetDB().Query(query, threeMonthsFromNow, now)
 	if err != nil {
 		return nil, ExecutiveViewSummary{}, err
 	}
@@ -797,6 +814,8 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 			&data.UnsignedAssets,
 			&data.UnpaidAssets,
 			&data.PaidAssets,
+			&data.DueAssets,
+			&data.OverdueAssets,
 		)
 		if err != nil {
 			return nil, ExecutiveViewSummary{}, err
@@ -814,6 +833,8 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 		summary.UnsignedAssets += data.UnsignedAssets
 		summary.UnpaidAssets += data.UnpaidAssets
 		summary.PaidAssets += data.PaidAssets
+		summary.DueAssets += data.DueAssets
+		summary.OverdueAssets += data.OverdueAssets
 	}
 
 	if err = rows.Err(); err != nil {
@@ -825,6 +846,9 @@ func GetExecutiveView() ([]ExecutiveViewData, ExecutiveViewSummary, error) {
 
 // GetCompanySummary retrieves summary data for a specific company
 func GetCompanySummary(companyID int) (ExecutiveViewData, error) {
+	now := time.Now().Unix()
+	threeMonthsFromNow := now + (3 * 30 * 24 * 60 * 60) // Approximate 3 months in seconds
+
 	// Query to get summary data for a specific company
 	query := `
 		SELECT
@@ -837,7 +861,9 @@ func GetCompanySummary(companyID int) (ExecutiveViewData, error) {
 			COUNT(CASE WHEN va.status = 'completed' THEN 1 END) as completed_assets,
 			COUNT(CASE WHEN va.status = 'unsigned' THEN 1 END) as unsigned_assets,
 			COUNT(CASE WHEN va.status = 'unpaid' THEN 1 END) as unpaid_assets,
-			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets
+			COUNT(CASE WHEN va.status = 'paid' THEN 1 END) as paid_assets,
+			COUNT(CASE WHEN va.tax_due_date IS NOT NULL AND va.tax_due_date <= $2 THEN 1 END) as due_assets,
+			COUNT(CASE WHEN va.tax_due_date IS NOT NULL AND va.tax_due_date < $3 THEN 1 END) as overdue_assets
 		FROM vehicle_asset va
 		LEFT JOIN utilization_company uc ON va.company_id = uc.id
 		WHERE va.company_id = $1
@@ -845,10 +871,54 @@ func GetCompanySummary(companyID int) (ExecutiveViewData, error) {
 	`
 
 	var data ExecutiveViewData
-	err := db.GetDB().SelectOne(&data, query, companyID)
+	err := db.GetDB().SelectOne(&data, query, companyID, threeMonthsFromNow, now)
 	if err != nil {
 		return ExecutiveViewData{}, err
 	}
 
 	return data, nil
+}
+
+// UpdateTaxStatuses updates vehicle asset statuses based on tax due dates
+// - Sets status to 'due' if tax is due within 3 months (including past dates) and current status allows it
+// - Sets status to 'overdue' if tax was due and status is 'due'
+func UpdateTaxStatuses() error {
+	now := time.Now().Unix()
+	threeMonthsFromNow := now + (3 * 30 * 24 * 60 * 60) // Approximate 3 months in seconds
+
+	// First, update assets to 'due' status if tax due within 3 months (including past)
+	// Only for assets with status in ('paid', 'unpaid', 'unsigned', 'completed')
+	// Skip assets with manual_status_override = TRUE
+	// This implements "only once" behavior since assets changed to 'due' are not updated again
+	query1 := `
+		UPDATE vehicle_asset
+		SET status = 'due', updated_at = $1
+		WHERE tax_due_date IS NOT NULL
+			AND tax_due_date <= $2
+			AND status IN ('paid', 'unpaid', 'unsigned', 'completed')
+			AND manual_status_override = FALSE
+	`
+
+	_, err := db.GetDB().Exec(query1, now, threeMonthsFromNow)
+	if err != nil {
+		return fmt.Errorf("failed to update assets to 'due' status: %v", err)
+	}
+
+	// Then, update assets to 'overdue' status if tax was due and status is 'due'
+	// Skip assets with manual_status_override = TRUE
+	query2 := `
+		UPDATE vehicle_asset
+		SET status = 'overdue', updated_at = $1
+		WHERE tax_due_date IS NOT NULL
+			AND tax_due_date < $2
+			AND status = 'due'
+			AND manual_status_override = FALSE
+	`
+
+	_, err = db.GetDB().Exec(query2, now, now)
+	if err != nil {
+		return fmt.Errorf("failed to update assets to 'overdue' status: %v", err)
+	}
+
+	return nil
 }

@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"time"
 
 	"aset-app/controllers"
 	"aset-app/db"
 	"aset-app/forms"
 	"aset-app/helpers"
+	"aset-app/models"
 	"aset-app/services"
 
 	"github.com/gin-contrib/gzip"
@@ -94,6 +96,30 @@ func main() {
 
 	services.InitializeMinioClient()
 
+	// Start background tax status update scheduler (runs every 6 hours)
+	go func() {
+		ticker := time.NewTicker(6 * time.Hour)
+		defer ticker.Stop()
+
+		// Run immediately on startup
+		log.Println("Running initial tax status update...")
+		if err := models.UpdateTaxStatuses(); err != nil {
+			log.Printf("Error updating tax statuses on startup: %v", err)
+		} else {
+			log.Println("Tax status update completed successfully")
+		}
+
+		// Then run every 6 hours
+		for range ticker.C {
+			log.Println("Running scheduled tax status update...")
+			if err := models.UpdateTaxStatuses(); err != nil {
+				log.Printf("Error updating tax statuses: %v", err)
+			} else {
+				log.Println("Tax status update completed successfully")
+			}
+		}
+	}()
+
 	v1 := r.Group("/v1")
 	{
 		/*** START USER ***/
@@ -149,6 +175,7 @@ func main() {
 		v1.GET("/vehicle-asset/company/:companyId", TokenAuthMiddleware(), vehicleAsset.GetByCompany)
 		v1.GET("/vehicle-asset/company/:companyId/summary", TokenAuthMiddleware(), vehicleAsset.GetCompanySummary)
 		v1.GET("/vehicle-assets/summary", TokenAuthMiddleware(), vehicleAsset.GetSummary)
+		v1.POST("/vehicle-assets/update-tax-statuses", TokenAuthMiddleware(), vehicleAsset.UpdateTaxStatuses)
 
 		v1.GET("/signed-url/:objectName", TokenAuthMiddleware(), func(c *gin.Context) {
 			objectName := c.Param("objectName")
