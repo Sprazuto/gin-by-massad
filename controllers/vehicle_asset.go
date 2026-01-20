@@ -827,3 +827,14 @@ func (v *VehicleAssetController) GetCompanySummary(c *gin.Context) {
 
 	c.JSON(http.StatusOK, companyData)
 }
+
+// UpdateTaxStatuses triggers the automated update of vehicle asset statuses based on tax due dates
+func (v *VehicleAssetController) UpdateTaxStatuses(c *gin.Context) {
+	err := models.UpdateTaxStatuses()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Tax statuses updated successfully"})
+}
