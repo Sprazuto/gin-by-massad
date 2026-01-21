@@ -889,10 +889,11 @@ func UpdateTaxStatuses() error {
 	// First, update assets to 'due' status if tax due within 3 months (including past)
 	// Only for assets with status in ('paid', 'unpaid', 'unsigned', 'completed')
 	// Skip assets with manual_status_override = TRUE
+	// Reset e_sign_status, recommendation_document_path, notes, payment_billing_photo_path, and payment_billing_date when becoming due
 	// This implements "only once" behavior since assets changed to 'due' are not updated again
 	query1 := `
 		UPDATE vehicle_asset
-		SET status = 'due', updated_at = $1
+		SET status = 'due', updated_at = $1, e_sign_status = FALSE, recommendation_document_path = '', notes = '', payment_billing_photo_path = '', payment_billing_date = NULL
 		WHERE tax_due_date IS NOT NULL
 			AND tax_due_date <= $2
 			AND status IN ('paid', 'unpaid', 'unsigned', 'completed')
@@ -906,9 +907,10 @@ func UpdateTaxStatuses() error {
 
 	// Then, update assets to 'overdue' status if tax was due and status is 'due'
 	// Skip assets with manual_status_override = TRUE
+	// Reset e_sign_status, recommendation_document_path, notes, payment_billing_photo_path, and payment_billing_date when becoming overdue
 	query2 := `
 		UPDATE vehicle_asset
-		SET status = 'overdue', updated_at = $1
+		SET status = 'overdue', updated_at = $1, e_sign_status = FALSE, recommendation_document_path = '', notes = '', payment_billing_photo_path = '', payment_billing_date = NULL
 		WHERE tax_due_date IS NOT NULL
 			AND tax_due_date < $2
 			AND status = 'due'
