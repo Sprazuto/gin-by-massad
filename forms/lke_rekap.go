@@ -22,10 +22,12 @@ type CreateLkeRekapForm struct {
 	PredikatAkhirM string  `form:"predikat_akhir_m" json:"predikat_akhir_m" binding:"required,max=50"`
 	PredikatM      string  `form:"predikat_m" json:"predikat_m" binding:"required,max=50"`
 	StatusEvaluasi string  `form:"status_evaluasi" json:"status_evaluasi" binding:"required,max=50"`
+	IDSekdis       int64   `form:"id_sekdis" json:"id_sekdis"`
 	IDVerifikator  int64   `form:"id_verifikator" json:"id_verifikator" binding:"required"`
 	IDKetua        int64   `form:"id_ketua" json:"id_ketua" binding:"required"`
 	IDEvaluator    int64   `form:"id_evaluator" json:"id_evaluator" binding:"required"`
 	IDPengendali   int64   `form:"id_pengendali" json:"id_pengendali" binding:"required"`
+	IDIrban        int64   `form:"id_irban" json:"id_irban"`
 }
 
 // UpdateLkeRekapForm ...
@@ -41,10 +43,12 @@ type UpdateLkeRekapForm struct {
 	PredikatAkhirM *string  `form:"predikat_akhir_m" json:"predikat_akhir_m" binding:"omitempty,max=50"`
 	PredikatM      *string  `form:"predikat_m" json:"predikat_m" binding:"omitempty,max=50"`
 	StatusEvaluasi *string  `form:"status_evaluasi" json:"status_evaluasi" binding:"omitempty,max=50"`
+	IDSekdis       *int64   `form:"id_sekdis" json:"id_sekdis"`
 	IDVerifikator  *int64   `form:"id_verifikator" json:"id_verifikator"`
 	IDKetua        *int64   `form:"id_ketua" json:"id_ketua"`
 	IDEvaluator    *int64   `form:"id_evaluator" json:"id_evaluator"`
 	IDPengendali   *int64   `form:"id_pengendali" json:"id_pengendali"`
+	IDIrban        *int64   `form:"id_irban" json:"id_irban"`
 }
 
 // IDOPD ...
@@ -196,6 +200,32 @@ func (f LkeRekapForm) IDPengendali(tag string, errMsg ...string) (message string
 	}
 }
 
+// IDSekdis ...
+func (f LkeRekapForm) IDSekdis(tag string, errMsg ...string) (message string) {
+	switch tag {
+	case "required":
+		if len(errMsg) == 0 {
+			return "Please enter the ID sekdis"
+		}
+		return errMsg[0]
+	default:
+		return "Something went wrong, please try again later"
+	}
+}
+
+// IDIrban ...
+func (f LkeRekapForm) IDIrban(tag string, errMsg ...string) (message string) {
+	switch tag {
+	case "required":
+		if len(errMsg) == 0 {
+			return "Please enter the ID irban"
+		}
+		return errMsg[0]
+	default:
+		return "Something went wrong, please try again later"
+	}
+}
+
 // Create ...
 func (f LkeRekapForm) Create(err error) string {
 	switch err.(type) {
@@ -229,6 +259,10 @@ func (f LkeRekapForm) Create(err error) string {
 				return f.IDEvaluator(err.Tag())
 			case "IDPengendali":
 				return f.IDPengendali(err.Tag())
+			case "IDSekdis":
+				return f.IDSekdis(err.Tag())
+			case "IDIrban":
+				return f.IDIrban(err.Tag())
 			}
 		}
 
@@ -272,6 +306,10 @@ func (f LkeRekapForm) Update(err error) string {
 				return f.IDEvaluator(err.Tag())
 			case "IDPengendali":
 				return f.IDPengendali(err.Tag())
+			case "IDSekdis":
+				return f.IDSekdis(err.Tag())
+			case "IDIrban":
+				return f.IDIrban(err.Tag())
 			}
 		}
 

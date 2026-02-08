@@ -251,3 +251,384 @@ func (ctrl LkeRekapController) GetByOPDAndTahun(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": data})
 }
+
+// GetIDSekdisByStatusEvaluasi gets all id_sekdis records grouped by status_evaluasi
+// @Summary Get ID Sekdis Grouped by Status Evaluasi
+// @Description Get all id_sekdis records grouped by status_evaluasi, filtered by tahun
+// @Tags LKE Rekap
+// @Produce json
+// @Security Bearer
+// @Param tahun path int true "Year"
+// @Success 200 {object} map[string]interface{} "Grouped id_sekdis data"
+// @Failure 400 {object} map[string]interface{} "Invalid year parameter"
+// @Failure 500 {object} map[string]interface{} "Could not get id_sekdis records"
+// @Router /v1/lke-rekaps/sekdis-by-status/{tahun} [get]
+func (ctrl LkeRekapController) GetIDSekdisByStatusEvaluasi(c *gin.Context) {
+	tahunParam := c.Param("tahun")
+
+	tahun, err := strconv.Atoi(tahunParam)
+	if err != nil || tahun <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Message": "Invalid tahun parameter - must be a positive integer"})
+		return
+	}
+
+	data, err := lkeRekapModel.GetIDSekdisByStatusEvaluasi(tahun)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Message": "Could not get id_sekdis records"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": data})
+}
+
+// SubmitToSekdis transitions status from draft to sekdis_review
+// @Summary Submit to SEKDIS review
+// @Description Submit LKE Rekap for SEKDIS review
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/submit-sekdis [post]
+func (ctrl LkeRekapController) SubmitToSekdis(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusSekdisReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Submitted to SEKDIS for review",
+		Status:      models.StatusSekdisReview,
+		StatusLabel: GetStatusLabel(models.StatusSekdisReview),
+	})
+}
+
+// ApproveBySekdis transitions status from sekdis_review to evaluator_review
+// @Summary SEKDIS approves
+// @Description SEKDIS approves and sends to Evaluator
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/approve-sekdis [post]
+func (ctrl LkeRekapController) ApproveBySekdis(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusEvaluatorReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Approved by SEKDIS, sent to Evaluator",
+		Status:      models.StatusEvaluatorReview,
+		StatusLabel: GetStatusLabel(models.StatusEvaluatorReview),
+	})
+}
+
+// RejectBySekdis transitions status from sekdis_review back to draft
+// @Summary SEKDIS rejects
+// @Description SEKDIS rejects and returns to draft
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/reject-sekdis [post]
+func (ctrl LkeRekapController) RejectBySekdis(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusDraft)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Rejected by SEKDIS, returned to draft",
+		Status:      models.StatusDraft,
+		StatusLabel: GetStatusLabel(models.StatusDraft),
+	})
+}
+
+// ApproveByEvaluator transitions status from evaluator_review to ketua_review
+// @Summary Submit to KETUA review
+// @Description Submit LKE Rekap for KETUA review
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/approve-evaluator [post]
+func (ctrl LkeRekapController) ApproveByEvaluator(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusKetuaReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Approved by Evaluator, sent to Ketua",
+		Status:      models.StatusKetuaReview,
+		StatusLabel: GetStatusLabel(models.StatusKetuaReview),
+	})
+}
+
+// RejectByEvaluator transitions status from evaluator_review back to draft
+// @Summary Evaluator rejects
+// @Description Evaluator rejects and returns to draft
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/reject-evaluator [post]
+func (ctrl LkeRekapController) RejectByEvaluator(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusDraft)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Rejected by Evaluator, returned to draft",
+		Status:      models.StatusDraft,
+		StatusLabel: GetStatusLabel(models.StatusDraft),
+	})
+}
+
+// ApproveByKetua transitions status from ketua_review to pengendali_review
+// @Summary KETUA approves
+// @Description KETUA approves and sends to Pengendali
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/approve-ketua [post]
+func (ctrl LkeRekapController) ApproveByKetua(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusPengendaliReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Approved by KETUA, sent to Pengendali",
+		Status:      models.StatusPengendaliReview,
+		StatusLabel: GetStatusLabel(models.StatusPengendaliReview),
+	})
+}
+
+// RejectByKetua transitions status from ketua_review back to evaluator_review
+// @Summary KETUA rejects
+// @Description KETUA rejects and returns to Evaluator
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/reject-ketua [post]
+func (ctrl LkeRekapController) RejectByKetua(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusEvaluatorReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Rejected by KETUA, returned to Evaluator",
+		Status:      models.StatusEvaluatorReview,
+		StatusLabel: GetStatusLabel(models.StatusEvaluatorReview),
+	})
+}
+
+// ApproveByPengendali transitions status from pengendali_review to irban_review
+// @Summary PENGENDALI approves
+// @Description PENGENDALI approves and sends to IRBAN
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/approve-pengendali [post]
+func (ctrl LkeRekapController) ApproveByPengendali(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusIrbanReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Approved by PENGENDALI, sent to IRBAN",
+		Status:      models.StatusIrbanReview,
+		StatusLabel: GetStatusLabel(models.StatusIrbanReview),
+	})
+}
+
+// RejectByPengendali transitions status from pengendali_review back to evaluator_review
+// @Summary PENGENDALI rejects
+// @Description PENGENDALI rejects and returns to Evaluator
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/reject-pengendali [post]
+func (ctrl LkeRekapController) RejectByPengendali(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusEvaluatorReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Rejected by PENGENDALI, returned to Evaluator",
+		Status:      models.StatusEvaluatorReview,
+		StatusLabel: GetStatusLabel(models.StatusEvaluatorReview),
+	})
+}
+
+// ApproveByIrban transitions status from irban_review to final
+// @Summary IRBAN finalizes
+// @Description IRBAN finalizes the evaluation
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/approve-irban [post]
+func (ctrl LkeRekapController) ApproveByIrban(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusFinal)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Finalized by IRBAN",
+		Status:      models.StatusFinal,
+		StatusLabel: GetStatusLabel(models.StatusFinal),
+	})
+}
+
+// RejectByIrban transitions status from irban_review back to evaluator_review
+// @Summary IRBAN rejects
+// @Description IRBAN rejects and returns to Evaluator
+// @Tags LKE Rekap Workflow
+// @Produce json
+// @Security Bearer
+// @Param id path int true "LKE Rekap ID"
+// @Success 200 {object} StatusTransitionResponse "Status updated"
+// @Failure 400 {object} map[string]interface{} "Invalid status transition"
+// @Router /v1/lke-rekap/{id}/reject-irban [post]
+func (ctrl LkeRekapController) RejectByIrban(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.UpdateStatus(id, models.StatusEvaluatorReview)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Rejected by IRBAN, returned to Evaluator",
+		Status:      models.StatusEvaluatorReview,
+		StatusLabel: GetStatusLabel(models.StatusEvaluatorReview),
+	})
+}
+
+// ResetToDraft resets any record back to draft (admin function)
+func (ctrl LkeRekapController) ResetToDraft(c *gin.Context) {
+	id := parseID(c)
+	if id == 0 {
+		return
+	}
+
+	err := lkeRekapModel.ResetToDraft(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, StatusTransitionResponse{
+		Message:     "Reset to draft successfully",
+		Status:      models.StatusDraft,
+		StatusLabel: GetStatusLabel(models.StatusDraft),
+	})
+}
+
+// StatusTransitionResponse represents response for status transition endpoints
+type StatusTransitionResponse struct {
+	Message           string `json:"message"`
+	Status            string `json:"status"`
+	StatusLabel       string `json:"status_label"`
+	PreviousStatus    string `json:"previous_status,omitempty"`
+	StatusDescription string `json:"status_description,omitempty"`
+}
+
+// parseID is a helper to parse ID from URL parameter
+func parseID(c *gin.Context) int64 {
+	id := c.Param("id")
+	getID, err := strconv.ParseInt(id, 10, 64)
+	if getID == 0 || err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"Message": "Invalid parameter"})
+		return 0
+	}
+	return getID
+}
+
+// GetStatusLabel returns localized status label for workflow responses
+func GetStatusLabel(status string) string {
+	return models.GetStatusLabel(status)
+}

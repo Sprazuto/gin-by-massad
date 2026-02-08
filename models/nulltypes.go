@@ -24,6 +24,13 @@ func (ns *NullString) Scan(value interface{}) error {
 	return nil
 }
 
+func (ns NullString) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return ns.String, nil
+}
+
 func (ns NullString) MarshalJSON() ([]byte, error) {
 	if !ns.Valid {
 		return []byte("null"), nil

@@ -1,4 +1,17 @@
 definitions:
+  controllers.StatusTransitionResponse:
+    properties:
+      message:
+        type: string
+      previous_status:
+        type: string
+      status:
+        type: string
+      status_description:
+        type: string
+      status_label:
+        type: string
+    type: object
   forms.CreateArticleForm:
     properties:
       content:
@@ -69,11 +82,15 @@ definitions:
     properties:
       id_evaluator:
         type: integer
+      id_irban:
+        type: integer
       id_ketua:
         type: integer
       id_opd:
         type: integer
       id_pengendali:
+        type: integer
+      id_sekdis:
         type: integer
       id_verifikator:
         type: integer
@@ -197,11 +214,15 @@ definitions:
     properties:
       id_evaluator:
         type: integer
+      id_irban:
+        type: integer
       id_ketua:
         type: integer
       id_opd:
         type: integer
       id_pengendali:
+        type: integer
+      id_sekdis:
         type: integer
       id_verifikator:
         type: integer
@@ -1140,6 +1161,292 @@ paths:
       tags:
       - Used in E-Office
       - LKE Rekap
+  /v1/lke-rekap/{id}/approve-evaluator:
+    post:
+      description: Submit LKE Rekap for KETUA review
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Submit to KETUA review
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/approve-irban:
+    post:
+      description: IRBAN finalizes the evaluation
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: IRBAN finalizes
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/approve-ketua:
+    post:
+      description: KETUA approves and sends to Pengendali
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: KETUA approves
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/approve-pengendali:
+    post:
+      description: PENGENDALI approves and sends to IRBAN
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: PENGENDALI approves
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/approve-sekdis:
+    post:
+      description: SEKDIS approves and sends to Evaluator
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: SEKDIS approves
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/reject-evaluator:
+    post:
+      description: Evaluator rejects and returns to draft
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Evaluator rejects
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/reject-irban:
+    post:
+      description: IRBAN rejects and returns to Evaluator
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: IRBAN rejects
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/reject-ketua:
+    post:
+      description: KETUA rejects and returns to Evaluator
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: KETUA rejects
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/reject-pengendali:
+    post:
+      description: PENGENDALI rejects and returns to Evaluator
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: PENGENDALI rejects
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/reject-sekdis:
+    post:
+      description: SEKDIS rejects and returns to draft
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: SEKDIS rejects
+      tags:
+      - LKE Rekap Workflow
+  /v1/lke-rekap/{id}/submit-sekdis:
+    post:
+      description: Submit LKE Rekap for SEKDIS review
+      parameters:
+      - description: LKE Rekap ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated
+          schema:
+            $ref: '#/definitions/controllers.StatusTransitionResponse'
+        "400":
+          description: Invalid status transition
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Submit to SEKDIS review
+      tags:
+      - LKE Rekap Workflow
   /v1/lke-rekap/opd/{id_opd}/tahun/{tahun}:
     get:
       description: Get a LKE Rekap record by OPD ID and year, including its evaluasi
@@ -1274,6 +1581,39 @@ paths:
       summary: Get all LKE Rekap records
       tags:
       - Used in E-Office
+      - LKE Rekap
+  /v1/lke-rekaps/sekdis-by-status/{tahun}:
+    get:
+      description: Get all id_sekdis records grouped by status_evaluasi, filtered
+        by tahun
+      parameters:
+      - description: Year
+        in: path
+        name: tahun
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Grouped id_sekdis data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid year parameter
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Could not get id_sekdis records
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - Bearer: []
+      summary: Get ID Sekdis Grouped by Status Evaluasi
+      tags:
       - LKE Rekap
   /v1/lke-rekomendasi:
     post:
@@ -1559,8 +1899,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "401":
-          description: Unauthorized
+        "400":
+          description: Invalid request
           schema:
             additionalProperties: true
             type: object
@@ -1584,7 +1924,7 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
+        "200":
           description: Successfully registered
           schema:
             additionalProperties: true

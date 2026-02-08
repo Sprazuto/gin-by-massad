@@ -1379,6 +1379,457 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/lke-rekap/{id}/approve-evaluator": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Submit LKE Rekap for KETUA review",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "Submit to KETUA review",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/approve-irban": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "IRBAN finalizes the evaluation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "IRBAN finalizes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/approve-ketua": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "KETUA approves and sends to Pengendali",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "KETUA approves",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/approve-pengendali": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "PENGENDALI approves and sends to IRBAN",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "PENGENDALI approves",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/approve-sekdis": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "SEKDIS approves and sends to Evaluator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "SEKDIS approves",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/reject-evaluator": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Evaluator rejects and returns to draft",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "Evaluator rejects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/reject-irban": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "IRBAN rejects and returns to Evaluator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "IRBAN rejects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/reject-ketua": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "KETUA rejects and returns to Evaluator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "KETUA rejects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/reject-pengendali": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "PENGENDALI rejects and returns to Evaluator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "PENGENDALI rejects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/reject-sekdis": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "SEKDIS rejects and returns to draft",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "SEKDIS rejects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekap/{id}/submit-sekdis": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Submit LKE Rekap for SEKDIS review",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap Workflow"
+                ],
+                "summary": "Submit to SEKDIS review",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "LKE Rekap ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.StatusTransitionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/v1/lke-rekap/{id}/{format}": {
             "get": {
                 "security": [
@@ -1463,6 +1914,55 @@ const docTemplate = `{
                     },
                     "406": {
                         "description": "Could not get LKE Rekap records",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/lke-rekaps/sekdis-by-status/{tahun}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all id_sekdis records grouped by status_evaluasi, filtered by tahun",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LKE Rekap"
+                ],
+                "summary": "Get ID Sekdis Grouped by Status Evaluasi",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year",
+                        "name": "tahun",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grouped id_sekdis data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid year parameter",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Could not get id_sekdis records",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -2015,8 +2515,8 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Invalid request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -2050,7 +2550,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Successfully registered",
                         "schema": {
                             "type": "object",
@@ -2095,6 +2595,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controllers.StatusTransitionResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "previous_status": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_description": {
+                    "type": "string"
+                },
+                "status_label": {
+                    "type": "string"
+                }
+            }
+        },
         "forms.CreateArticleForm": {
             "type": "object",
             "required": [
@@ -2209,6 +2729,9 @@ const docTemplate = `{
                 "id_evaluator": {
                     "type": "integer"
                 },
+                "id_irban": {
+                    "type": "integer"
+                },
                 "id_ketua": {
                     "type": "integer"
                 },
@@ -2216,6 +2739,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id_pengendali": {
+                    "type": "integer"
+                },
+                "id_sekdis": {
                     "type": "integer"
                 },
                 "id_verifikator": {
@@ -2372,6 +2898,9 @@ const docTemplate = `{
                 "id_evaluator": {
                     "type": "integer"
                 },
+                "id_irban": {
+                    "type": "integer"
+                },
                 "id_ketua": {
                     "type": "integer"
                 },
@@ -2379,6 +2908,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id_pengendali": {
+                    "type": "integer"
+                },
+                "id_sekdis": {
                     "type": "integer"
                 },
                 "id_verifikator": {
