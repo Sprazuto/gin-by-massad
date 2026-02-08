@@ -206,10 +206,13 @@ CREATE TABLE IF NOT EXISTS lke_rekap (
     predikat_akhir_m character varying,
     predikat_m character varying,
     status_evaluasi character varying,
+    status_label character varying,
+    id_sekdis integer,
     id_verifikator integer,
-    id_ketua integer,
     id_evaluator integer,
+    id_ketua integer,
     id_pengendali integer,
+    id_irban integer,
     updated_at integer,
     created_at integer
 );
@@ -239,6 +242,8 @@ ALTER COLUMN id_evaluator
 SET DATA TYPE integer,
 ALTER COLUMN id_pengendali
 SET DATA TYPE integer,
+ALTER COLUMN id_irban
+SET DATA TYPE integer,
 ALTER COLUMN updated_at
 SET DATA TYPE integer,
 ALTER COLUMN created_at
@@ -256,6 +261,39 @@ ADD COLUMN IF NOT EXISTS predikat_akhir_m character varying;
 
 ALTER TABLE lke_rekap
 ADD COLUMN IF NOT EXISTS predikat_m character varying;
+
+-- Add status_label column and constraints
+ALTER TABLE lke_rekap
+ADD COLUMN IF NOT EXISTS status_label character varying;
+
+-- Set NOT NULL constraint on status_label
+ALTER TABLE lke_rekap ALTER COLUMN status_label SET NOT NULL;
+
+-- Add previous_status and status_description columns
+ALTER TABLE lke_rekap
+ADD COLUMN IF NOT EXISTS previous_status character varying;
+
+ALTER TABLE lke_rekap
+ADD COLUMN IF NOT EXISTS status_description character varying;
+
+-- Add CHECK constraint for valid status_evaluasi values
+ALTER TABLE lke_rekap
+ADD CONSTRAINT IF NOT EXISTS chk_status_evaluasi CHECK (
+    status_evaluasi IN (
+        'draft',
+        'sekdis_review',
+        'evaluator_review',
+        'ketua_review',
+        'pengendali_review',
+        'irban_review',
+        'final'
+    )
+);
+
+-- Create indexes for status queries
+CREATE INDEX IF NOT EXISTS idx_lke_rekap_status_evaluasi ON public.lke_rekap (status_evaluasi);
+
+CREATE INDEX IF NOT EXISTS idx_lke_rekap_status_label ON public.lke_rekap (status_label);
 
 --
 -- Name: lke_rekap_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres

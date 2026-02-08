@@ -30,7 +30,7 @@ func (a *AppController) Version(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"version": version,
-		"patch":   "1.4.11.11",
+		"patch":   "1.7.14",
 	})
 }
 

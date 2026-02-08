@@ -155,6 +155,21 @@ func main() {
 		v1.PUT("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Update)
 		v1.DELETE("/lke-rekap/:id", TokenAuthMiddleware(), lkeRekap.Delete)
 		v1.GET("/lke-rekap/opd/:id_opd/tahun/:tahun", TokenAuthMiddleware(), lkeRekap.GetByOPDAndTahun)
+		v1.GET("/lke-rekaps/sekdis-by-status/:tahun", TokenAuthMiddleware(), lkeRekap.GetIDSekdisByStatusEvaluasi)
+
+		/*** START LKE Rekap Workflow Endpoints ***/
+		v1.POST("/lke-rekap/:id/submit-sekdis", TokenAuthMiddleware(), lkeRekap.SubmitToSekdis)
+		v1.POST("/lke-rekap/:id/approve-sekdis", TokenAuthMiddleware(), lkeRekap.ApproveBySekdis)
+		v1.POST("/lke-rekap/:id/reject-sekdis", TokenAuthMiddleware(), lkeRekap.RejectBySekdis)
+		v1.POST("/lke-rekap/:id/approve-evaluator", TokenAuthMiddleware(), lkeRekap.ApproveByEvaluator)
+		v1.POST("/lke-rekap/:id/reject-evaluator", TokenAuthMiddleware(), lkeRekap.RejectByEvaluator)
+		v1.POST("/lke-rekap/:id/approve-ketua", TokenAuthMiddleware(), lkeRekap.ApproveByKetua)
+		v1.POST("/lke-rekap/:id/reject-ketua", TokenAuthMiddleware(), lkeRekap.RejectByKetua)
+		v1.POST("/lke-rekap/:id/approve-pengendali", TokenAuthMiddleware(), lkeRekap.ApproveByPengendali)
+		v1.POST("/lke-rekap/:id/reject-pengendali", TokenAuthMiddleware(), lkeRekap.RejectByPengendali)
+		v1.POST("/lke-rekap/:id/approve-irban", TokenAuthMiddleware(), lkeRekap.ApproveByIrban)
+		v1.POST("/lke-rekap/:id/reject-irban", TokenAuthMiddleware(), lkeRekap.RejectByIrban)
+		v1.POST("/lke-rekap/:id/reset", TokenAuthMiddleware(), lkeRekap.ResetToDraft)
 
 		/*** START LkeEvaluasi ***/
 		lkeEvaluasi := new(controllers.LkeEvaluasiController)

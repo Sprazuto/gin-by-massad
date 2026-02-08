@@ -60,7 +60,7 @@ func (ctrl UserController) Login(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param registerForm body forms.RegisterForm true "User registration data"
-// @Success 201 {object} map[string]interface{} "Successfully registered"
+// @Success 200 {object} map[string]interface{} "Successfully registered"
 // @Failure 400 {object} map[string]interface{} "Invalid request or validation failed"
 // @Router /v1/user/register [post]
 func (ctrl UserController) Register(c *gin.Context) {
@@ -88,7 +88,7 @@ func (ctrl UserController) Register(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} map[string]interface{} "Successfully logged out"
-// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 400 {object} map[string]interface{} "Invalid request"
 // @Router /v1/user/logout [get]
 func (ctrl UserController) Logout(c *gin.Context) {
 
