@@ -30,11 +30,7 @@ func (a *AppController) Version(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"version": version,
-<<<<<<< HEAD
-		"patch":   "1.5.12.10",
-=======
 		"patch":   "1.7.14",
->>>>>>> eoffice-lke/development
 	})
 }
 
