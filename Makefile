@@ -7,6 +7,9 @@ RED = \033[31m
 BLUE = \033[34m
 RESET = \033[0m
 
+# Version file
+VERSION_FILE = VERSION
+
 ## RUN APPLICATION
 run:
 	@echo -e "$(BLUE)🚀 Running the application...$(RESET)"
@@ -41,8 +44,17 @@ install_swag:
 	fi; \
 	echo -e "$(GREEN)✅ Swag installation check complete!$(RESET)"
 
+## UPDATE VERSION
+update_version:
+	@echo -e "$(YELLOW)🔄 Updating version from $(VERSION_FILE)...$(RESET)"
+	@version=`cat $(VERSION_FILE) | tr -d '\n\r'`; \
+	echo -e "$(BLUE)Version: $$version$(RESET)"; \
+	sed -i '' 's|// @version.*|// @version         '"$$version"'|' main.go; \
+	sed -i '' 's|"patch":.*|"patch":   "'"$$version"'",|' controllers/app.go; \
+	echo -e "$(GREEN)✅ Version updated in main.go and controllers/app.go$(RESET)"
+
 ## GENERATE API DOCUMENTATION
-generate_docs: install_swag
+generate_docs: update_version install_swag
 	@echo -e "$(YELLOW)📜 Generating API documentation using Swag...$(RESET)"
 	@export PATH=$$PATH:$$(go env GOPATH)/bin && swag init
 	@echo -e "$(GREEN)✅ API documentation generated successfully!$(RESET)"
@@ -51,6 +63,10 @@ generate_docs: install_swag
 build:
 	@echo -e "$(BLUE)🔨 Building the application...$(RESET)"
 	@go build -o lke-app .
+
+## FULL BUILD WITH VERSION UPDATE
+release: update_version generate_docs build
+	@echo -e "$(GREEN)🎉 Build complete with updated version!$(RESET)"
 
 ## CLEAN BUILDS
 clean:
@@ -70,10 +86,12 @@ help:
 	@echo "  run          - Run the application"
 	@echo "  test         - Run tests"
 	@echo "  build        - Build the application"
+	@echo "  release      - Update version, generate docs, and build"
+	@echo "  update_version - Update version from VERSION file"
+	@echo "  generate_docs - Generate API documentation using Swag"
 	@echo "  clean        - Clean build files"
 	@echo "  deps         - Install dependencies"
 	@echo "  install_swag - Install Swag CLI and dependencies"
-	@echo "  generate_docs - Generate API documentation using Swag"
 	@echo "  help         - Show this help message"
 
-.PHONY: run test install_swag generate_docs build clean deps help
+.PHONY: run test install_swag update_version generate_docs build release clean deps help
